@@ -1,13 +1,13 @@
 /**
  * Created by Administrator on 2015/9/15.
  */
-//ƒ£ƒ‚…Ë±∏◊ ‘¥¿‡
-function SimResource(Index,Majorid,Minorid)
-{
+//Ê®°ÊãüËÆæÂ§áËµÑÊ∫êÁ±ª
+function SimResource(Index,Majorid,Minorid){
   this.Index = Index;
   this.Majorid = Majorid;
   this.Minorid = Minorid;
   this.UI = new UI(Index);
+  this.TaskListSession = '#Simres_list tbody';
 }
 
 SimResource.prototype = {
@@ -30,9 +30,11 @@ SimResource.prototype = {
   },
 
   CreateTask: function () {
+
     if (this.Majorid == null || this.Minorid == null) {
       return;
     }
+
     var cookie_session = 'xwsessionid';
     var ReqContent = {
       "xwsessionid": $.cookie(cookie_session),
@@ -46,6 +48,7 @@ SimResource.prototype = {
     var urlpara = '/front/task';
 
     this.UI.ClearDOMTextContent('#Log_TaskStatus');
+
     $.ajax({
       type:"POST",
       url:urlpara,
@@ -62,6 +65,15 @@ SimResource.prototype = {
     });
   },
 
+  GetResIndx:function () {
+    if(this.Index == null)
+    {
+      return;
+    }
+
+    return this.Index;
+  },
+
   ProcessCreateTask: function (TaskInfo) {
 
     if(TaskInfo.result === 0 && TaskInfo.message === 'success')
@@ -76,34 +88,16 @@ SimResource.prototype = {
     }
   },
 
-  QueryResHistory:function(Type,IdIndex){
-    //«Î«Û¿˙ ∑≤Ÿ◊˜Log
+  QueryResHistory:function(){
+    //ËØ∑Ê±ÇÂéÜÂè≤Êìç‰ΩúLog
     var ReqContent = {
       "":""
     };
     var contentTypeStr = 'application/json;charset=UTF-8';
-    var Res = null;
     var urlpara = '';
+    var IdIndex = this.GetResIndx();
 
-    if(Type === 'Simulation')
-    {
-      Res = this.SimResArray[IdIndex];
-    }
-    else if(Type === 'Real')
-    {
-      Res = this.RealResArray[IdIndex];
-    }
-    else
-    {
-      console.log('Unknow Resource Type:'+Type);
-      return;
-    }
-
-    if(Res == null)
-    {
-      console.log('No Such Resource Id = '+IdIndex);
-    }
-    urlpara = '/front/task/list?major_id='+ Res.GetMajorId() +'&minor_id='+Res.GetMinorId();
+    urlpara = '/front/task/list?major_id='+ this.GetMajorId() +'&minor_id='+this.GetMinorId();
 
     $.ajax({
       type:"GET",
@@ -111,11 +105,12 @@ SimResource.prototype = {
       cache:false,
       dataType:'json',
       contentType:contentTypeStr,
+      context:this,
       data:JSON.stringify(ReqContent),
 
       success:this.ProcessQueryResHandleHistory,
       error: function() {
-        alert("QueryHistoryLog Error!");
+        console.log("QueryResHandleHistory Error! ResId = " + this.GetResIndx());
       }
     });
 
@@ -126,7 +121,7 @@ SimResource.prototype = {
     var TaskList = ResHandleHistory.task;
     var CurTime = null;
 
-    UI.prototype.ClearDOMTextContent('#Log_ResHandleHistory');
+    this.UI.ClearDOMTextContent('#Log_ResHandleHistory');
     if(TaskList.length === 0)
     {
       return;
@@ -136,21 +131,22 @@ SimResource.prototype = {
     {
       CurTime = new Date(TaskList[TaskItem].date);
       HistoryContent += '<h5 style="white-space:pre">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem].user +
-        '   ExecTaskid£∫'+TaskList[TaskItem].id + '   Status£∫'+TaskList[TaskItem].status +
-        '   Result£∫'+TaskList[TaskItem].result+'</h5>';
+        '   ExecTaskidÔºö'+TaskList[TaskItem].id + '   StatusÔºö'+TaskList[TaskItem].status +
+        '   ResultÔºö'+TaskList[TaskItem].result+'</h5>';
     }
-    UI.prototype.SetDOMHtmlContent('#Log_ResHandleHistory',HistoryContent);
+    this.UI.SetDOMHtmlContent('#Log_ResHandleHistory',HistoryContent);
 
   },
 
-  AddResItemToList: function (Ele) {
+  AddResItemToList: function (itemdata) {
+
     var template = null;
 
-    template = this.UI.GenerateAndParseResTemplate(Ele,this.Index);
-    this.UI.AddHandlerToEvent(template,'click',this.QueryResHistory('Simulation',this.Index));
+    template = this.UI.GenerateAndParseResTemplate(this.TaskListSession,itemdata,this.Index);
+    this.UI.AddHandlerToTemplate(template,'click',this.QueryResHistory());
   },
 
-  QueryRunningLog: function (task_id){
+  QueryRunningLog: function(task_id){
     var ReqContent = {
       "":""
     };
@@ -163,6 +159,7 @@ SimResource.prototype = {
       cache:false,
       dataType:'json',
       contentType:contentTypeStr,
+      context:this,
       data:JSON.stringify(ReqContent),
 
       success:this.ProcessTaskLogQuery,
@@ -180,12 +177,15 @@ SimResource.prototype = {
       {
         if(this.CurTimerID == undefined)
         {
-          this.CurTimerID = setInterval(function(){ this.QueryRunningLog(TaskLog.task_id);}, 3000);
+          var Context = this;
+          this.CurTimerID = setInterval(function () {
+              Context.QueryRunningLog(Context.CurTaskId);
+            }, 3000);
         }
       }
       else if(TaskLog.status === "close")
       {
-        //Õ£÷π∂® ±∆˜
+        //ÂÅúÊ≠¢ÂÆöÊó∂Âô®
         if(this.CurTimerID != undefined)
         {
           clearInterval(this.CurTimerID);
@@ -197,20 +197,13 @@ SimResource.prototype = {
         this.TaskStatusQuery(TaskLog.task_id);
       }
 
-      var LogSession = data.log;
+      var LogSession = TaskLog.log;
       if(LogSession.length === 0)
       {
         return;
       }
-      if(data.current_log_id.toString() === LogSession[LogSession.length - 1].id)
-      {
-        return;
-      }
-      else
-      {
-        this.UI.PrintLogToLogSession(LogSession,'#log_session');
-      }
 
+      this.UI.PrintLogToLogSession(LogSession,'#log_session');
     }
   },
 
@@ -227,6 +220,7 @@ SimResource.prototype = {
     cache:false,
     dataType:'json',
     contentType:contentTypeStr,
+    context:this,
     data:JSON.stringify(ReqContent),
 
     success:this.ProcessTaskStatusQuery,
@@ -242,6 +236,10 @@ SimResource.prototype = {
     {
       this.UI.ChangeTaskStatus(TaskStatus.task);
     }
+  },
+
+  SetChildObjProtoType: function () {
+    this.UI.__proto__ = UI.prototype;
   }
 };
 

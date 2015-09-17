@@ -2,9 +2,8 @@
  * Created by Administrator on 2015/9/14.
  */
 
-//´´½¨UserÃüÃû¿Õ¼ä£¬°üº¬ÓÃ»§Ïà¹ØµÄËùÓĞ½á¹¹
-function UsrObj(name,sessionid)
-{
+//åˆ›å»ºUserå‘½åç©ºé—´ï¼ŒåŒ…å«ç”¨æˆ·ç›¸å…³çš„æ‰€æœ‰ç»“æ„
+function UsrObj(name,sessionid){
   this.name = name;
   this.sessionid = sessionid;
   this.SimResArray = new Array();
@@ -13,14 +12,13 @@ function UsrObj(name,sessionid)
   this.RealResId = 0;
 }
 
-//¶¨Òå·½·¨
+//å®šä¹‰æ–¹æ³•
 UsrObj.prototype = {
+  GetSimResId:function() {
+  return this.SimResId;
+},
 
-  GetSimResId: function () {
-    return this.SimResId;
-  },
-
-  SetSimResId: function (SimResId) {
+  SetSimResId:function(SimResId) {
     this.SimResId = SimResId;
   },
 
@@ -38,6 +36,7 @@ UsrObj.prototype = {
       cache:false,
       dataType:'json',
       contentType:contentTypeStr,
+      context:this,
       data:JSON.stringify(ReqContent),
 
       success:this.ProcessQueryResList,
@@ -49,14 +48,13 @@ UsrObj.prototype = {
 
   ProcessQueryResList:function(ResListArray) {
     var item = null;
-    var InsertBlock = '';
     var Res = null;
 
     if(ResListArray.length === 0)
     {
       return;
     }
-    //±éÀúÖ÷Éè±¸×ÊÔ´ÁĞ±í
+    //éå†ä¸»è®¾å¤‡èµ„æºåˆ—è¡¨
     for(var MajorResIndx in ResListArray)
     {
       item = ResListArray[MajorResIndx].sub_resource;
@@ -67,12 +65,11 @@ UsrObj.prototype = {
 
       if(ResListArray[MajorResIndx].type === 'simulation')
       {
-        InsertBlock = '#Sim_reslist tbody';
-        //±éÀú´ÓÉè±¸×ÊÔ´ÁĞ±í
+        //éå†ä»è®¾å¤‡èµ„æºåˆ—è¡¨
         for(var MinorResIndx in item)
         {
           item[MinorResIndx].ip = ResListArray[MajorResIndx].ip;
-          //¼ÇÂ¼µ½¶ÔÓ¦ÊµÀıÖĞ
+          //è®°å½•åˆ°å¯¹åº”å®ä¾‹ä¸­
           Res = new SimResource(this.GetSimResId(),MajorResIndx,MinorResIndx);
           this.SimResArray[this.GetSimResId()] = Res;
           this.SetSimResId(this.GetSimResId() + 1);
@@ -82,72 +79,50 @@ UsrObj.prototype = {
       }
       else if(ResListArray[MajorResIndx].type === 'real')
       {
-        InsertBlock = '#Realres_list tbody';
-        //TODO:Ìí¼ÓÕæÊµ»·¾³´¦Àí
+        //TODO:æ·»åŠ çœŸå®ç¯å¢ƒå¤„ç†
       }
 
     }
   },
 
   QueryTaskListStatus:function(){
-    var ReqContent = {
-      "":""
-    };
-    var contentTypeStr = 'application/json;charset=UTF-8';
-    var urlpara = '/front/task/list?major_id=1&minor_id=1';
+  var ReqContent = {
+    "":""
+  };
+  var contentTypeStr = 'application/json;charset=UTF-8';
+  var urlpara = '/front/task/list?major_id=1&minor_id=1';
 
-    $.ajax({
-      type:"GET",
-      url:urlpara,
-      cache:false,
-      dataType:'json',
-      contentType:contentTypeStr,
-      data:JSON.stringify(ReqContent),
+  $.ajax({
+    type:"GET",
+    url:urlpara,
+    cache:false,
+    dataType:'json',
+    contentType:contentTypeStr,
+    data:JSON.stringify(ReqContent),
 
-      success:function(data){
-        //TODO:ÖØ¹¹
-        var template = $("#panel_module").clone();
+    success:function(data){
+      //TODO:é‡æ„
+      var template = $("#panel_module").clone();
 
-      },
-      error: function() {
-        alert("QueryHistoryLog Error!");
-      }
-    });
-  },
+    },
+    error: function() {
+      alert("QueryHistoryLog Error!");
+    }
+  });
+},
 
-  Logout: function() {
-    var contentTypeStr = 'application/json;charset=UTF-8';
-    var urlpara = '/front/user/logout/';
-    var cookie_session = 'xwsessionid';
-    var cookie_name = 'username';
+  SetChildObjProtoType: function () {
+    var Child = this.SimResArray;
+    for(item in Child)
+    {
+      Child[item].__proto__ = SimResource.prototype;
+      Child[item].SetChildObjProtoType();
+    }
 
-    $.ajax({
-      type:"POST",
-      url:urlpara+ this.sessionid,
-      cache:false,
-      dataType:'json',
-      contentType:contentTypeStr,
-      data:JSON.stringify({
-        "xwsessionid":$.cookie(cookie_session)
-      }),
-
-      success:function(data) {
-        if(data.result === 0 && data.message === 'success')
-        {
-          $.cookie(cookie_session, null);
-          $.cookie(cookie_name, null);
-          location.href ="index.html"
-        }
-        else
-        {
-          console.log("µÇ³öÊ§°Ü\n" + data.result+'\n' + data.message);
-        }
-
-      },
-      error: function() {
-        console.log("AjaxÏìÓ¦Òì³££¡");
-      }
-    });
+    Child = this.RealResArray;
+    for(item in Child)
+    {
+      //Child[item].prototype = Resource.prototype;
+    }
   }
-
 };

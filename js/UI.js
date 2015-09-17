@@ -2,9 +2,8 @@
  * Created by Administrator on 2015/9/15.
  */
 
-function UI(ResId)
-{
-  //¹ØÁª×ÊÔ´ID(Éè±¸ID/ÓÃÀı×éID/ÆäËüID)
+function UI(ResId){
+  //å…³è”èµ„æºID(è®¾å¤‡ID/ç”¨ä¾‹ç»„ID/å…¶å®ƒID)
   this.ResId = ResId;
 }
 
@@ -13,21 +12,22 @@ UI.prototype = {
   GenerateAndParseResTemplate: function(InsertBlock,itemData,IdIndex) {
 
     var template = $('#Sim_reslist tr:hidden').clone();
+    var ResId = 0;
 
-    //¼ì²é×´Ì¬¸üĞÂtr classÑùÊ½
+    //æ£€æŸ¥çŠ¶æ€æ›´æ–°tr classæ ·å¼
     switch(itemData.status)
     {
       case 'idle':
         template.attr('class','success');
         break;
-      case 'running':
-        template.attr('class','success');
+      case 'run':
+        template.attr('class','info');
         break;
     }
-    //½âÎöÊı¾İÄÚÈİÌí¼Ótd±êÇ©
+    //è§£ææ•°æ®å†…å®¹æ·»åŠ tdæ ‡ç­¾
     var tdHtmlContent = '<td>'+IdIndex+'</td>';
 
-    //ÏÈ°´±íÍ·½á¹¹Ğ´ËÀË³Ğò
+    //å…ˆæŒ‰è¡¨å¤´ç»“æ„å†™æ­»é¡ºåº
     tdHtmlContent+='<td>'+itemData.name+'</td>';
     if(itemData.config == null)
     {
@@ -40,35 +40,42 @@ UI.prototype = {
     tdHtmlContent+='<td>'+itemData.ip+'</td>';
     tdHtmlContent+='<td>'+itemData.status+'</td>';
 
-    //¸ù¾İStatusÌí¼Ó°´Å¥
+    //æ ¹æ®Statusæ·»åŠ æŒ‰é’®
     if(itemData.status === 'idle')
     {
-      tdHtmlContent+='<td><a href="BeginTest.html">¿ªÊ¼²âÊÔ</a></td>';
+      tdHtmlContent+='<td><a href="javascript:;">å¼€å§‹æµ‹è¯•</a></td>';
     }
     else
     {
       tdHtmlContent+='<td> </td>'
     }
 
-    //½«×éºÏµÄtdÄÚÈİ¸üĞÂµ½trÖĞ
+    //å°†ç»„åˆçš„tdå†…å®¹æ›´æ–°åˆ°trä¸­
     this.SetDOMHtmlContent(template,tdHtmlContent);
-    //Ìí¼Óµ½×ÊÔ´ÁĞ±íÖĞ
+    template.find('a').attr('href','TaskStart.html?ResId='+this.ResId);
+    ResId = this.ResId;
+    /*template.find('a').bind('click',function(){
+      var cWin = window.open('TaskStart.html?ResId='+ResId,'_blank');
+      var UsrObj = GetShareCache();
+      cWin.window.top['_CACHE'] = $.extend(true, {}, UsrObj);
+    });*/
+    //æ·»åŠ åˆ°èµ„æºåˆ—è¡¨ä¸­
     $(template).appendTo(InsertBlock);
     template.show(1000);
 
     return template;
   },
 
-  AddHandlerToEvent: function (Ele,Event,Handler) {
+  AddHandlerToTemplate: function (Ele,Event,Handler) {
     $(Ele).bind(Event,Handler);
   },
 
   ClearDOMTextContent: function(session){
-    session.text('');
+    $(session).text('');
   },
 
   SetDOMHtmlContent: function(session,htmlContent) {
-    session.html(htmlContent);
+    $(session).html(htmlContent);
   },
 
   InsetTaskToList: function(task_id){
@@ -78,7 +85,7 @@ UI.prototype = {
     template.attr("id",task_id);
     template.find("a").attr("href","#panel_TaskItem"+"_"+task_id);
     template.find("a").text(CurTime.toLocaleString());
-    template.find("div").find(".panel-body").text("ÕıÔÚÖ´ĞĞÓÃÀıxx");
+    template.find("div").find(".panel-body").text("æ­£åœ¨æ‰§è¡Œç”¨ä¾‹xx");
     template.find("#panel_TaskItem_1").attr("id","panel_TaskItem"+"_"+task_id);
     template.show(500);
     this.SpanFlashTimerID = setInterval(function(){ $("#"+task_id+" span").fadeOut(500).fadeIn(500); },1000);
@@ -103,15 +110,20 @@ UI.prototype = {
 
     if(task.result === "fail")
     {
-      $("#" + task.id + " span").text("Ê§°Ü");
+      $("#" + task.id + " span").text("å¤±è´¥");
       $("#" + task.id).attr("class","panel panel-danger");
       $("#" + task.id + " span").attr("class","badge badge-important pull-right");
     }
     else if(task.result === "success")
     {
-      $("#" + task.id + " span").find('span').text("³É¹¦");
+      $("#" + task.id + " span").find('span').text("æˆåŠŸ");
       $("#" + task.id).attr("class","panel panel-success");
       $("#" + task.id + " span").find('span').attr("class","badge badge-success pull-right");
     }
   },
+
+  closeWindow: function () {
+    window.open('','_self');
+    window.close();
+  }
 };
