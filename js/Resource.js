@@ -29,6 +29,15 @@ SimResource.prototype = {
     return this.Minorid;
   },
 
+  GetResIndx:function () {
+    if(this.Index == null)
+    {
+      return;
+    }
+
+    return this.Index;
+  },
+
   CreateTask: function () {
 
     if (this.Majorid == null || this.Minorid == null) {
@@ -63,15 +72,6 @@ SimResource.prototype = {
         console.log('Create Task Failed, Resource MajorId:'+this.GetMajorId()+' MinorId:'+this.GetMinorId());
       }
     });
-  },
-
-  GetResIndx:function () {
-    if(this.Index == null)
-    {
-      return;
-    }
-
-    return this.Index;
   },
 
   ProcessCreateTask: function (TaskInfo) {

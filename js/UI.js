@@ -15,8 +15,7 @@ UI.prototype = {
     var ResId = 0;
 
     //检查状态更新tr class样式
-    switch(itemData.status)
-    {
+    switch(itemData.status){
       case 'idle':
         template.attr('class','success');
         break;
