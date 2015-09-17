@@ -2,7 +2,7 @@
  * Created by Administrator on 2015/9/15.
  */
 
-function UserLogout(UsrObj){
+function UserLogout(){
   var contentTypeStr = 'application/json;charset=UTF-8';
   var urlpara = '/front/user/logout/';
   var cookie_session = 'xwsessionid';
@@ -24,7 +24,6 @@ function UserLogout(UsrObj){
         $.cookie(cookie_session, null);
         $.cookie(cookie_name, null);
         $.cookie(cookie_UsrObj, null);
-        UsrObj = null;
       }
       else
       {
@@ -69,7 +68,7 @@ function RecoverUsrObj(Usr){
 $(document).ready(function(){
 
   //观察者模式
-  $('#logout').click({Usr:Usr},function(event){UserLogout(event.data.Usr)});
+  $('#logout').click(function(){UserLogout()});
   //触发DOM绘制完成事件，通知各模块加载相应功能
   $(document).trigger('DocReady');
 

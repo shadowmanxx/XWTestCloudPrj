@@ -49,35 +49,37 @@ UsrObj.prototype = {
   ProcessQueryResList:function(ResListArray) {
     var item = null;
     var Res = null;
-
+    var MajorId;
+    var MinorId;
     if(ResListArray.length === 0)
     {
       return;
     }
     //遍历主设备资源列表
-    for(var MajorResIndx in ResListArray)
+    for(var ResIndx in ResListArray)
     {
-      item = ResListArray[MajorResIndx].sub_resource;
+      item = ResListArray[ResIndx].sub_resource;
       if(item.length === 0)
       {
         continue;
       }
-
-      if(ResListArray[MajorResIndx].type === 'simulation')
+      MajorId = ResListArray[ResIndx].major_id;
+      if(ResListArray[ResIndx].type === 'simulation')
       {
         //遍历从设备资源列表
-        for(var MinorResIndx in item)
+        for(var SubResIndx in item)
         {
-          item[MinorResIndx].ip = ResListArray[MajorResIndx].ip;
+          item[SubResIndx].ip = ResListArray[ResIndx].ip;
+          MinorId = item[SubResIndx].minor_id;
           //记录到对应实例中
-          Res = new SimResource(this.GetSimResId(),MajorResIndx,MinorResIndx);
+          Res = new SimResource(this.GetSimResId(),MajorId,MinorId);
           this.SimResArray[this.GetSimResId()] = Res;
           this.SetSimResId(this.GetSimResId() + 1);
 
-          Res.AddResItemToList(item[MinorResIndx]);
+          Res.AddResItemToList(item[SubResIndx]);
         }
       }
-      else if(ResListArray[MajorResIndx].type === 'real')
+      else if(ResListArray[ResIndx].type === 'real')
       {
         //TODO:添加真实环境处理
       }

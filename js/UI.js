@@ -9,7 +9,7 @@ function UI(ResId){
 
 UI.prototype = {
 
-  GenerateAndParseResTemplate: function(InsertBlock,itemData,IdIndex) {
+  GenerateAndParseResTemplate: function(InsertBlock,itemData,MajorId,MinorId) {
 
     var template = $('#Sim_reslist tr:hidden').clone();
     var ResId = 0;
@@ -25,7 +25,7 @@ UI.prototype = {
         break;
     }
     //解析数据内容添加td标签
-    var tdHtmlContent = '<td>'+IdIndex+'</td>';
+    var tdHtmlContent = '<td>'+this.ResId+'</td>';
 
     //先按表头结构写死顺序
     tdHtmlContent+='<td>'+itemData.name+'</td>';
@@ -52,9 +52,10 @@ UI.prototype = {
 
     //将组合的td内容更新到tr中
     this.SetDOMHtmlContent(template,tdHtmlContent);
-    template.find('a').attr('href','TaskStart.html?ResId='+this.ResId);
+    template.find('a').attr('href','TaskStart.html?ResId='+this.ResId+'&MajorId='+MajorId+'&MinorId='+MinorId);
+    /*新页面跳转，可传递原始对象参数，上下文也指向该父页面
     ResId = this.ResId;
-    /*template.find('a').bind('click',function(){
+    template.find('a').bind('click',function(){
       var cWin = window.open('TaskStart.html?ResId='+ResId,'_blank');
       var UsrObj = GetShareCache();
       cWin.window.top['_CACHE'] = $.extend(true, {}, UsrObj);
@@ -64,10 +65,6 @@ UI.prototype = {
     template.show(1000);
 
     return template;
-  },
-
-  AddHandlerToTemplate: function (Ele,Event,Handler) {
-    $(Ele).bind(Event,Handler);
   },
 
   ClearDOMTextContent: function(session){

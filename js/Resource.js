@@ -38,7 +38,7 @@ SimResource.prototype = {
     var cookie_session = 'xwsessionid';
     var ReqContent = {
       "xwsessionid": $.cookie(cookie_session),
-      "type":"Simulation",
+      "type":"simulation",
       "reversion":"",
       "code_path":"",
       "test_group":"",
@@ -130,9 +130,9 @@ SimResource.prototype = {
     for(var TaskItem in TaskList)
     {
       CurTime = new Date(TaskList[TaskItem].date);
-      HistoryContent += '<h5 style="white-space:pre">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem].user +
+      HistoryContent += '<a style="white-space:pre" href="'+TaskList[TaskItem].log_file+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem].user +
         '   ExecTaskid：'+TaskList[TaskItem].id + '   Status：'+TaskList[TaskItem].status +
-        '   Result：'+TaskList[TaskItem].result+'</h5>';
+        '   Result：'+TaskList[TaskItem].result+'</a>';
     }
     this.UI.SetDOMHtmlContent('#Log_ResHandleHistory',HistoryContent);
 
@@ -141,9 +141,11 @@ SimResource.prototype = {
   AddResItemToList: function (itemdata) {
 
     var template = null;
-
-    template = this.UI.GenerateAndParseResTemplate(this.TaskListSession,itemdata,this.Index);
-    this.UI.AddHandlerToTemplate(template,'click',this.QueryResHistory());
+    var Context = this;
+    template = this.UI.GenerateAndParseResTemplate(this.TaskListSession,itemdata,this.Majorid,this.Minorid);
+    template.click(function () {
+      Context.QueryResHistory();
+    });
   },
 
   QueryRunningLog: function(task_id){
