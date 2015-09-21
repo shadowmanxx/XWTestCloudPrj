@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>信威云测试平台</title>
+<link rel="stylesheet" href='css/bootstrap.min.css'>
+<link rel="stylesheet" href="css/style.css" media="screen">
+<link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
+
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script src="js/jquery.validate.js"></script>
+
+<script>
+
+
+$(document).ready(function(){
+
+  //Jquery Validation配置
+  var validator = $("#form-login").validate({
+    debug: true,
+    rules: {
+            username: {
+                required: true,
+                minlength: 2,
+                maxlength: 10
+            },
+            password: {
+                required: true,
+                minlength: 2,
+                maxlength: 16
+            }
+        },
+        messages: {
+            username: {
+                required: '请输入用户名',
+                minlength: '用户名不能小于2个字符',
+                maxlength: '用户名不能超过10个字符',
+                remote: '用户名不存在'
+            },
+            password: {
+                required: '请输入密码',
+                minlength: '密码不能小于2个字符',
+                maxlength: '密码不能超过16个字符'
+            }
+        },
+        //验证通过后，才允许提交
+        submitHandler:function(form){
+          var usrname = $('#username').val();
+          var passwd = $('#password').val();
+
+          var urlpara = '/front/user/login';
+          var contentTypeStr = 'application/json;charset=UTF-8';
+          var cookie_session = 'xwsessionid';
+          var cookie_username = 'username';
+
+          $.ajax({
+            type:"POST",
+            url:urlpara,
+            cache:false,
+            dataType:'json',
+            contentType:contentTypeStr,
+            data:JSON.stringify(
+            {
+              "name": usrname, "password":passwd
+            }),
+
+            success:function(data) {
+              if(data.result === 0 && data.message === 'success')
+              {
+                $.cookie(cookie_session, data.xwsessionid );
+                $.cookie(cookie_username, usrname);
+                window.open("homepage.html","_self");
+              }
+              else
+              {
+                alert("验证失败\n"+"result: "+data.result+"\nmessage: "+data.message);
+              }
+
+            },
+            error: function() {
+              alert("Ajax响应异常！");
+            }
+          });
+        },
+        //设置错误容器位置及CSS样式
+        errorLabelContainer:"#error-container",
+        errorElement:"li",
+        wrapper:"ul",
+        errorClass:"login-error"
+    });
+  
+});
+
+</script>
+</head>
+
+<body class="login-page">
+  <div class="container login-title">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="text-center">西安信威云测试平台</h2>	
+      </div>
+    </div>        
+   </div>
+   
+  <div class="container login-form"> 
+    <form id="form-login" role="form" method="post">
+      <div class="row">
+        <div class="col-md-4 col-md-offset-4"> 
+          <div class="input-group">
+            <span class="input-group-addon">
+	  		  <i class="glyphicon glyphicon-user"></i>
+            </span>
+            <input type="text" class="form-control " name="username" id="username" placeholder="请输入用户名">
+          </div>
+        </div>    
+      </div>
+      <div class="row">
+        <div class="col-md-4 col-md-offset-4">   
+	      <div class="input-group">
+            <span class="input-group-addon">
+       		  <span class="glyphicon glyphicon-qrcode"></span>
+            </span>            
+            <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码" >
+          </div>
+         </div>       
+      </div> 
+     
+      <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+          <p id="error-container" style="margin-bottom: 0px"></p>
+          <input class="btn btn-primary btn-block btn-login" type = "submit" id="login_btn" value="登陆"/>
+        </div>
+      </div>       
+      </form>
+     </div>        
+
+  
+       
+</body>
+</html>

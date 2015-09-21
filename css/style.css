@@ -1,0 +1,109 @@
+.login-page{
+  background:#303641;
+}
+.login-page .login-title{
+  margin-top:7%;
+  margin-bottom:5%;
+  color:#FFF;
+  font-family:"微软雅黑";
+}
+.login-page .login-form {
+  position: relative;
+  padding-top: 60px;
+  -moz-transition: all 550ms ease-in-out;
+  -o-transition: all 550ms ease-in-out;
+  -webkit-transition: all 550ms ease-in-out;
+  transition: all 550ms ease-in-out;
+}
+.login-form .row{
+  margin-bottom: 15px;
+  -moz-transition: all 550ms ease-in-out;
+  -o-transition: all 550ms ease-in-out;
+  -webkit-transition: all 550ms ease-in-out;
+  transition: all 550ms ease-in-out;
+}
+.login-form .btn{
+  height:45px;
+  font-family:"Arial";
+  font-size:19px;
+  letter-spacing: 10px;
+}
+
+.login-form .row .col-md-4{
+  padding-left:40px;
+  padding-right:40px;
+}
+.login-page .login-content {
+  position: relative;
+  width: 33.33%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px 0;
+  -moz-transition: all 550ms ease-in-out;
+  -o-transition: all 550ms ease-in-out;
+  -webkit-transition: all 550ms ease-in-out;
+  transition: all 550ms ease-in-out;
+}
+
+.login-page .login-form .input-group {
+  background: #373e4a;
+  border: 1px solid #373e4a;
+  height: auto;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  -moz-transition: all 300ms ease-in-out;
+  -o-transition: all 300ms ease-in-out;
+  -webkit-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+input{
+  color: #000000;
+}
+#error-container .login-error{
+  color: #FF0000;
+  font-size: 20px;
+}
+
+.login-page .login-form .input-group .form-control{
+  height:45px;
+}
+
+
+.home-page,.TestCaseGrp{
+  margin-top:15px;
+}
+.home-page .nav-tabs{
+  margin-bottom: 15px;
+}
+.home-page #Log_ResHandleHistory a{
+
+  #border-bottom: 1px solid #ccc;
+  display: block;
+  padding: 4px 20px 8px 20px;
+}
+
+.home-page .nav-tabs .active{
+  font-weight: bold;
+}
+.home-page .tab-content{
+  margin-bottom: 100px;
+}
+
+.home-page nav .dropdown-menu{
+  min-width: 107px;
+}
+
+.TestCaseGrp .TestCasesPanel{
+  margin-top: 80px;
+}
+
+.TestCaseGrp .TestCasesPanel .panel-body .center-block{
+  width: 78.3%;
+}
