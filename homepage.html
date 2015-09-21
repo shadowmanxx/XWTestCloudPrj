@@ -4,11 +4,14 @@
     <meta charset="utf-8">
     <title>信威云测试平台</title>
     <link rel="stylesheet" href='css/bootstrap.min.css'>
+    <link rel="stylesheet" href='css/jquery-ui.min.css'>
     <link rel="stylesheet" href="css/style.css" media="screen">
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/jquery.cookie.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+
     <script src="js/User.js"></script>
     <script src="js/UI.js"></script>
     <script src="js/Resource.js"></script>
@@ -167,7 +170,7 @@
 
             <ul id="HistoryTab" class="nav nav-tabs">
                 <li class="active">
-                    <a href="#ResHandleHistory_Log" data-toggle="tab">
+                    <a href="#Log_ResHandleHistory" data-toggle="tab">
                         历史操作
                     </a>
                 </li>
@@ -175,8 +178,16 @@
             <div id="Log_ResHandleHistory">
 
             </div>
+            <div style="margin-top: 80px">
+                <form name="form_upload" method="post" action="/upload" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="inputfile">文件输入</label>
+                        <input type="file" id="inputfile" name="file">
+                    </div>
+                    <button type="submit" class="btn btn-default" id='FileUpload'>上传文件</button>
+                </form>
 
-            <button class="btn btn-default btn-primary" id="test">Test</button>
+            </div>
         </div>
     </div>
 </div>

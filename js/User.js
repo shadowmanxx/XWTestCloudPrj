@@ -6,8 +6,8 @@
 function UsrObj(name,sessionid){
   this.name = name;
   this.sessionid = sessionid;
-  this.SimResArray = new Array();
-  this.RealResArray = new Array();
+  this.SimResArray = [];
+  this.RealResArray = [];
   this.SimResId = 0;
   this.RealResId = 0;
 }
