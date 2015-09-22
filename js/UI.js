@@ -12,7 +12,6 @@ UI.prototype = {
   GenerateAndParseResTemplate: function(InsertBlock,itemData,MajorId,MinorId) {
 
     var template = $('#Sim_reslist tr:hidden').clone();
-    var ResId = 0;
 
     //检查状态更新tr class样式
     switch(itemData.status){
@@ -23,6 +22,7 @@ UI.prototype = {
         template.attr('class','info');
         break;
     }
+    template.attr('id','Sim_resitem' + this.ResId);
     //解析数据内容添加td标签
     var tdHtmlContent = '<td>'+this.ResId+'</td>';
 

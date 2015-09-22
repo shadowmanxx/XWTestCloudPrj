@@ -4,12 +4,17 @@
 
 function PageInit(){
 
-  $('#drag-items p').draggable({
-    appendTo: 'body',
-    helper: 'clone',
-    cursor: "crosshair",
-    opacity: 0.6
+  $("[data-toggle='popover']").popover({
+    'trigger':'click hover'
+
   });
+
+  $('#drag-items p').draggable({
+    helper: 'clone',
+    //connectToSortable: "#drag-dropZone",
+    opacity: 0.6,
+    revert:'invalid'
+  }).disableSelection();
 
   $('#drag-dropZone').droppable({
     activeClass: "ui-state-default",
@@ -23,25 +28,33 @@ function PageInit(){
       el.find('span').append(remove);
       //增加测试用例点击事件
       el.find('a').attr({
-          'id':'modal',
-          'href':'#modal-container',
-
-        });
+        'id':'modal',
+        'href':'#modal-container',
+        'data-toggle':'modal'
+      });
       $(remove).unbind("click").bind("click", function(event) {
         //阻止事件传播，停止冒泡
         event.stopPropagation();
-        $(this).parent().parent().detach();
+        $(this).parent().parent().parent().remove();
       });
 
       $(this).append(el);
     }
   }).sortable({
-    items: '.drop-item',
+    revert: true,
+    receive: function () {
+
+    },
     sort: function() {
-      $( this ).removeClass( "active" );
-    }
+     $( this ).removeClass( "active" );
+     }
   });
 }
+
+
+
+
+
 function PageDestroy(){
   //SaveObjToCookie('UsrObj',Usr);
 }
