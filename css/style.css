@@ -101,9 +101,18 @@ input{
 }
 
 .TestCaseGrp .TestCasesPanel{
-  margin-top: 80px;
+  margin-top: 8px;
 }
 
 .TestCaseGrp .TestCasesPanel .panel-body .center-block{
   width: 78.3%;
+}
+
+.TestCaseGrp #content .btn-toolbar{
+    margin-top: 30px;
+}
+
+.TestCaseGrp .ui-draggable a span{
+  white-space: normal;
+  word-break: break-all;
 }

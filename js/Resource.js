@@ -195,7 +195,7 @@ SimResource.prototype = {
           this.CurTimerID = undefined;
           this.UI.SpanFlashTimerID = undefined;
         }
-
+        $(document).trigger('CurTaskEnd');
         this.TaskStatusQuery(TaskLog.task_id);
       }
 
@@ -205,7 +205,7 @@ SimResource.prototype = {
         return;
       }
 
-      this.UI.PrintLogToLogSession(LogSession,'#log_session');
+      this.UI.PrintLogToLogSession(LogSession,'#Log_TaskStatus');
     }
   },
 

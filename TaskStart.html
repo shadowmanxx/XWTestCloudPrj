@@ -14,6 +14,7 @@
   <script src="js/UI.js"></script>
   <script src="js/Resource.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/TestCaseObject.js"></script>
   <script src="js/TaskStart.js"></script>
 </head>
 
@@ -39,7 +40,7 @@
           <div>
             <ul class="nav navbar-nav">
               <li><a href="homepage.html">首页</a></li>
-              <li class="active"><a href="TaskStart.html">开始测试</a></li>
+              <li><a href="TestCaseManage.html">测试用例管理</a></li>
             </ul>
 
           </div>
@@ -49,6 +50,30 @@
     </div>
     <div class="row">
       <div class="col-md-3">
+        <div class="panel panel-default" id="TestCaseGrp">
+          <div class="panel-heading">
+            <h3 class="panel-title">测试用例组选择</h3>
+          </div>
+          <div class="panel-body" >
+            <form class="form-horizontal" role="form" id="TestCaseGrp_body">
+            </form>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">文件上传</h3>
+          </div>
+          <div class="panel-body" id="UploadFile">
+            <div style="margin-top: 10px">
+              <form name="form_upload" method="post" action="/upload" enctype="multipart/form-data">
+                <div class="form-group">
+                  <input type="file" id="inputfile" name="file">
+                </div>
+                <button type="submit" class="btn btn-success btn-sm" id='FileUpload'>上传文件</button>
+              </form>
+            </div>
+          </div>
+        </div>
         <div class="panel-group" id="panel_TaskList">
             <div class="panel panel-default" style="display: none" id="panel_module">
               <div class="panel-heading">
@@ -73,8 +98,8 @@
             欢迎使用信威云测试平台
           </h1>
           <p>现在，</p>
-          <button class="btn btn-primary btn-large" id="BeginTest">
-            开始测试
+          <button class="btn btn-primary btn-large" id="BeginTest" data-loading-text="执行中...">
+            开始执行
           </button>
         </div>
         <div class="page-header"><h2>LogSession</h2></div>

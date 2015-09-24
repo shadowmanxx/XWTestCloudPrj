@@ -9,6 +9,7 @@ function UI(ResId){
 
 UI.prototype = {
 
+  //TODO:重构
   GenerateAndParseResTemplate: function(InsertBlock,itemData,MajorId,MinorId) {
 
     var template = $('#Sim_reslist tr:hidden').clone();
@@ -64,6 +65,50 @@ UI.prototype = {
     template.show(1000);
 
     return template;
+  },
+
+  GenerateAndParseTestCaseGrp:function(Location,itemData){
+    var template = $('<tr></tr>');
+
+    //解析数据内容添加td标签
+    var tdHtmlContent = '<td>'+this.ResId+'</td>';
+
+    //先按表头结构写死顺序
+    tdHtmlContent+='<td>'+itemData.Name+'</td>';
+    tdHtmlContent+='<td>'+itemData.Creator+'</td>';
+    tdHtmlContent+='<td>'+itemData.Attr+'</td>';
+    tdHtmlContent+='<td><a href="#">修改</a></td>';
+
+    //将组合的td内容更新到tr中
+    this.SetDOMHtmlContent(template,tdHtmlContent);
+    template.find('a').attr('id','TestCaseGrp_' + this.ResId);
+
+    //添加到资源列表中
+    $(template).appendTo(Location);
+    template.show(1000);
+    return template;
+  },
+
+  GenerateAndParseTestCase:function(Location,itemData){
+    var template = null;
+
+    if(Location === '#drag-dropZone'){
+
+      template = $('<p class="ui-draggable"><a class="btn btn-default center-block" href="#modal-container" \
+                  data-toggle="modal" role="button" id="modal"><span>' + itemData.Name +
+                  '<button type="button" class="btn btn-default btn-xs remove pull-right"><span class="glyphicon glyphicon-trash">\
+                  </span></button></span></a></p>');
+
+      $(Location).append(template);
+      return template;
+    }
+    else{
+      template = $('<p><a class="btn btn-default center-block" href="#" data-toggle="popover" role="button" data-container="body"\
+                          data-placement="right" data-content=""><span></span></a></p>');
+      template.find('a').attr('data-content',itemData.Descp);
+      template.find('span').text(itemData.Name);
+      $(Location).append(template);
+    }
   },
 
   ClearDOMTextContent: function(session){

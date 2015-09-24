@@ -3,15 +3,20 @@
  */
 
 //测试用例类
-function TestCase(ID,Name,Description){
+function TestCaseObj(ID,Name,Creator,Description,SeverId){
 
   this.ID = ID;
   this.Name = Name;
+  this.Creator = Creator;
   this.Descp = Description;
+  this.SeverId = SeverId;
   this.CfgPara = [];
+  this.Location = '#drag-items';
+  this.UI = new UI(ID);
+
 }
 
-TestCase.prototype = {
+TestCaseObj.prototype = {
 
   GetID: function() {
     return this.ID;
@@ -21,13 +26,14 @@ TestCase.prototype = {
     return this.Descp;
   },
 
-  AddPara: function(Name,Property) {
+  AddPara: function(Name,Property,Comment) {
 
     //防止重复添加属性
     this.RemovePara(Name);
     this.CfgPara.push({
       'Name':Name,
-      'Property':Property
+      'Property':Property,
+      'Comment':Comment
     });
   },
 
@@ -56,14 +62,20 @@ TestCase.prototype = {
 
 
 //测试用例组类
-function TestCaseGrp(ID,Rule){
+function TestCaseGrpObj(ID,Name,Creator,Attr,Desc,ServerId){
 
   this.ID = ID;
+  this.Name = Name;
   this.TestCaseList = [];
-  this.VerifyRule = Rule;
+  this.Creator = Creator;
+  this.Attr = Attr;
+  this.Desc = Desc;
+  this.ServerId = ServerId;
+  this.UI = new UI(ID);
+  this.Location = '#TestCaseGrpTable';
 }
 
-TestCaseGrp.prototype = {
+TestCaseGrpObj.prototype = {
 
   GetID: function() {
     return this.ID;
