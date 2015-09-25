@@ -87,6 +87,20 @@ UsrObj.prototype = {
     }
   },
 
+  RemoveAllRes: function (){
+    if(this.SimResArray.length ===0){
+      console.log('No Resource to Remove');
+      return;
+    }
+
+    for(var item in this.SimResArray){
+      this.SimResArray[item].RemoveResItemFromList();
+      this.SimResArray[item] = undefined;
+    }
+
+    this.SetSimResId(0);
+  },
+
   QueryTaskListStatus:function(){
   var ReqContent = {
     "":""

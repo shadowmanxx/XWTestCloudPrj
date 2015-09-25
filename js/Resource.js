@@ -2,11 +2,11 @@
  * Created by Administrator on 2015/9/15.
  */
 //模拟设备资源类
-function SimResource(Index,Majorid,Minorid){
-  this.Index = Index;
+function SimResource(ID,Majorid,Minorid){
+  this.ID = ID;
   this.Majorid = Majorid;
   this.Minorid = Minorid;
-  this.UI = new UI(Index);
+  this.UI = new UI(ID);
   this.TaskListSession = '#Simres_list tbody';
 }
 
@@ -30,12 +30,12 @@ SimResource.prototype = {
   },
 
   GetResIndx:function () {
-    if(this.Index == null)
+    if(this.ID == null)
     {
       return;
     }
 
-    return this.Index;
+    return this.ID;
   },
 
   CreateTask: function () {
@@ -146,6 +146,10 @@ SimResource.prototype = {
     template.click(function () {
       Context.QueryResHistory();
     });
+  },
+
+  RemoveResItemFromList: function (){
+    this.UI.RemoveResTemplate(this.TaskListSession,this.ID);
   },
 
   QueryRunningLog: function(task_id){

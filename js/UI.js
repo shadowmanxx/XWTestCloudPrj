@@ -12,7 +12,7 @@ UI.prototype = {
   //TODO:重构
   GenerateAndParseResTemplate: function(InsertBlock,itemData,MajorId,MinorId) {
 
-    var template = $('#Sim_reslist tr:hidden').clone();
+    var template = $('<tr/>');
 
     //检查状态更新tr class样式
     switch(itemData.status){
@@ -62,9 +62,19 @@ UI.prototype = {
     });*/
     //添加到资源列表中
     $(template).appendTo(InsertBlock);
-    template.show(1000);
+    template.hide().show(1000);
 
     return template;
+  },
+
+  RemoveResTemplate:function(RemoveBlock,ID){
+    var Res = $(RemoveBlock + ' #Sim_resitem' + ID);
+
+    if(Res == null){
+      console.log('no Resource ID = '+ID);
+    }
+
+    Res.remove();
   },
 
   GenerateAndParseTestCaseGrp:function(Location,itemData){

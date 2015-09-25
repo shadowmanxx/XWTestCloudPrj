@@ -17,7 +17,10 @@ function PageInit(){
 
   var Usr = new UsrObj($.cookie('username'),$.cookie('xwsessionid'));
   Usr.QueryResList();
-
+  setInterval(function(){
+    Usr.RemoveAllRes();
+    Usr.QueryResList();
+  }, 8000)
 
 }
 function PageDestroy(){

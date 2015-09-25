@@ -100,13 +100,43 @@ function PageInit(){
 
     Res.CreateTask();
     $('#TestCaseGrp').hide(1000);
-    $('#UploadFile').parent().hide(1000);
+    $('#UploadFile').parent().parent().hide(1000);
     $(this).button('loading');
     var TaskStartBtnContext = this;
     //任务执行结束后动作
     $(document).on('CurTaskEnd',function(){
       $(TaskStartBtnContext).button('reset');
     });
+  });
+
+  $('#UploadFile').fileupload({
+    //dataType: 'json',
+    progressall: function (e, data) {
+      var progress = parseInt(data.loaded / data.total * 100, 10);
+      $('#UploadFile_progress .progress-bar').css(
+        'width',
+        progress + '%'
+      );
+    },
+    add: function (e, data) {
+      var btn = $('<button/>').text('上传').attr({
+        'class':'btn btn-success btn-block'
+      });
+      $(this).after(btn);
+
+      $('#UploadFile_progress .progress-bar').css(
+        'width', 0
+      ).text('');
+
+      data.context = btn.click(function () {
+          $(this).remove();
+          data.submit();
+        });
+    },
+    done: function (e, data) {
+      $('#UploadFile_progress .progress-bar').text("完成");
+      data.context.text('Upload finished.');
+    }
   });
 }
 function PageDestroy(){

@@ -100,6 +100,13 @@ input{
   min-width: 107px;
 }
 
+.home-page .progress{
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+.home-page .btn-block{
+    margin-top: 10px;
+}
 .TestCaseGrp .TestCasesPanel{
   margin-top: 8px;
 }
