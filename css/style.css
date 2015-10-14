@@ -121,5 +121,8 @@ input{
 
 .TestCaseGrp .ui-draggable a span{
   white-space: normal;
-  word-break: break-all;
+}
+
+.TestCaseGrp #content #TestCaseManageContent div{
+  margin-top: 10px;
 }

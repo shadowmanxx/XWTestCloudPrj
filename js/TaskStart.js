@@ -1,59 +1,9 @@
 /**
  * Created by Administrator on 2015/9/15.
  */
+var SpanFlashTimerID = null;
 
-function QueryTestCaseGrp(){
-
-
-  var contentTypeStr = 'application/json;charset=UTF-8';
-  var urlpara = '';
-
-  urlpara = '/front/testgroup/list?all=1';
-
-  $.ajax({
-    type:"GET",
-    url:urlpara,
-    cache:false,
-    dataType:'json',
-    contentType:contentTypeStr,
-    context:this,
-    success:function(TestGrpObj){
-      var TestCaseGrpIndx = 1;
-      if(TestGrpObj.result !=0 || TestGrpObj.message != 'success'){
-        return;
-      }
-
-      if(this.TestCaseGrpList.length !=0){
-        this.TestCaseGrpList = [];
-      }
-      if(TestGrpObj.testgroup.length === 0){
-        console.log('testgroup is empty');
-        return;
-      }
-      //向Usr中添加用例组
-      for(var item in TestGrpObj.testgroup){
-        var TestCaseGrpItem = TestGrpObj.testgroup[item];
-        var TestCaseGrp = new TestCaseGrpObj(TestCaseGrpIndx,TestCaseGrpItem.name,TestCaseGrpItem.user,TestCaseGrpItem.type,TestCaseGrpItem.desc,TestCaseGrpItem.id);
-        this.TestCaseGrpList[TestCaseGrpIndx] = TestCaseGrp;
-        ++TestCaseGrpIndx;
-      }
-
-      this.ParseTestCaseGrp();
-    },
-    error: function() {
-      console.log("QueryTestCaseGroup Error!");
-    }
-  });
-
-}
-
-function ParseTestCaseGrp(){
-
-  var ResList = this.TestCaseGrpList;
-
-  if(ResList.length === 0){
-    return;
-  }
+function ParseTestCaseGrpSection(ResList){
 
   for(var item in ResList){
     var TestCaseGrp = ResList[item];
@@ -69,7 +19,75 @@ function ParseTestCaseGrp(){
 
     $('#TestCaseGrp_body').append(template);
   }
+}
 
+function TestCaseGrpLoaded(e,UsrObj){
+
+  if(UsrObj.TestCaseGrpList.length === 0){
+    return;
+  }
+
+  ParseTestCaseGrpSection(UsrObj.TestCaseGrpList);
+
+}
+
+function ParseTaskRunningSection(TaskId){
+
+  var template = $("#panel_module").clone();
+  var CurTime = new Date();
+
+  template.attr("id",TaskId);
+  template.find("a").attr("href","#panel_TaskItem"+"_"+TaskId);
+  template.find("a").text(CurTime.toLocaleString());
+  template.find("div").find(".panel-body").text("正在执行用例xx");
+  template.find("#panel_TaskItem_1").attr("id","panel_TaskItem"+"_"+TaskId);
+  template.show(500);
+  SpanFlashTimerID = setInterval(function(){ $("#"+TaskId+" span").fadeOut(500).fadeIn(500); },1000);
+  $("#panel_TaskList").append(template);
+}
+
+function TaskStart(e,TaskId){
+
+  $('#TestCaseGrp').hide(1000);
+  $('#UploadFile').parent().parent().hide(1000);
+  $(this).button('loading');
+  ParseTaskRunningSection(TaskId);
+
+}
+
+function TaskEnd(e,TaskStatus){
+
+  $('#BeginTest').button('reset');
+  if(TaskStatus === undefined){
+    return;
+  }
+  clearInterval(SpanFlashTimerID);
+
+  if(TaskStatus.result === "fail"){
+    $("#" + TaskStatus.id + " span").text("失败");
+    $("#" + TaskStatus.id).attr("class","panel panel-danger");
+    $("#" + TaskStatus.id + " span").attr("class","badge badge-important pull-right");
+  }
+  else if(TaskStatus.result === "success"){
+    $("#" + TaskStatus.id + " span").find('span').text("成功");
+    $("#" + TaskStatus.id).attr("class","panel panel-success");
+    $("#" + TaskStatus.id + " span").find('span').attr("class","badge badge-success pull-right");
+  }
+  else{
+    console.log('Unknown TaskStatus Result: '+ TaskStatus.result);
+  }
+}
+
+function ParseTaskLogSection(TaskLog){
+
+  for(var item in TaskLog){
+    $('#Log_TaskStatus').append((TaskLog[item].content));
+  }
+}
+
+function TaskRunningLogArrive(e,TaskLog){
+
+  ParseTaskLogSection(TaskLog.log);
 }
 
 function PageInit(){
@@ -77,36 +95,27 @@ function PageInit(){
   var ResId = $.getURLParam('ResId');
   var MajorId = $.getURLParam('MajorId');
   var MinorId = $.getURLParam('MinorId');
-  var Res = null;
+  var Res = new SimResource(ResId,MajorId,MinorId);
+  var Usr = new UsrObj($.cookie('username'),$.cookie('xwsessionid'));
 
-  if(ResId == null || MajorId == null || MinorId == null)
-  {
+  if(ResId == null || MajorId == null || MinorId == null){
     alert('请选择测试设备');
     window.open("homepage.html","_self");
   }
-  Res = new SimResource(ResId,MajorId,MinorId);
-  //添加测试用例组
-  var Usr = new UsrObj($.cookie('username'),$.cookie('xwsessionid'));
-  Usr.TestCaseGrpList = [];
-  Usr.QueryTestCaseGrp = QueryTestCaseGrp;
-  Usr.ParseTestCaseGrp = ParseTestCaseGrp;
+
+  //TODO:查询设备状态和最近历史操作
 
   Usr.QueryTestCaseGrp();
+
   $('#BeginTest').click(function(){
+
     if($('#TestCaseGrp_body input:checked').val() == null){
       $('#TestCaseGrp').removeClass("panel-default").addClass("panel-danger").fadeOut(500).fadeIn(500);
       return;
     }
 
     Res.CreateTask();
-    $('#TestCaseGrp').hide(1000);
-    $('#UploadFile').parent().parent().hide(1000);
-    $(this).button('loading');
-    var TaskStartBtnContext = this;
-    //任务执行结束后动作
-    $(document).on('CurTaskEnd',function(){
-      $(TaskStartBtnContext).button('reset');
-    });
+
   });
 
   $('#UploadFile').fileupload({
@@ -139,9 +148,14 @@ function PageInit(){
     }
   });
 }
+
 function PageDestroy(){
-  //SaveObjToCookie('UsrObj',Usr);
+
 }
 
 $(document).on('DocReady',PageInit);
 $(document).on('WindowDestroy',PageDestroy);
+$(document).on('TestCaseGrpLoaded',TestCaseGrpLoaded);
+$(document).on('TaskStart',TaskStart);
+$(document).on('TaskEnd',TaskEnd);
+$(document).on('TaskRunningLogArrive',TaskRunningLogArrive);

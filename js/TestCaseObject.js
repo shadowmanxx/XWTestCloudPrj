@@ -3,7 +3,7 @@
  */
 
 //测试用例类
-function TestCaseObj(ID,Name,Creator,Description,SeverId){
+function AtomObj(ID,Name,Creator,Description,SeverId){
 
   this.ID = ID;
   this.Name = Name;
@@ -11,12 +11,9 @@ function TestCaseObj(ID,Name,Creator,Description,SeverId){
   this.Descp = Description;
   this.SeverId = SeverId;
   this.CfgPara = [];
-  this.Location = '#drag-items';
-  this.UI = new UI(ID);
-
 }
 
-TestCaseObj.prototype = {
+AtomObj.prototype = {
 
   GetID: function() {
     return this.ID;
@@ -26,14 +23,15 @@ TestCaseObj.prototype = {
     return this.Descp;
   },
 
-  AddPara: function(Name,Property,Comment) {
+  AddPara: function(name,val,comment,type) {
 
     //防止重复添加属性
-    this.RemovePara(Name);
+    this.RemovePara(name);
     this.CfgPara.push({
-      'Name':Name,
-      'Property':Property,
-      'Comment':Comment
+      Name:name,
+      Val:val,
+      Comment:comment,
+      Type:type       //标示字段是否必填
     });
   },
 
@@ -51,7 +49,7 @@ TestCaseObj.prototype = {
       }
     }
 
-    if(Index === this.CfgPara.length - 1){
+    if(Index === (this.CfgPara.length - 1).toString()){
       console.log('No Such TestCaseName='+Name);
       return -1;
     }
@@ -71,8 +69,6 @@ function TestCaseGrpObj(ID,Name,Creator,Attr,Desc,ServerId){
   this.Attr = Attr;
   this.Desc = Desc;
   this.ServerId = ServerId;
-  this.UI = new UI(ID);
-  this.Location = '#TestCaseGrpTable';
 }
 
 TestCaseGrpObj.prototype = {
@@ -105,11 +101,62 @@ TestCaseGrpObj.prototype = {
       }
     }
 
-    if(Index === this.TestCaseList.length - 1){
+    if(Index === (this.TestCaseList.length - 1).toString()){
       console.log('No such TestCase Name='+Name);
       return -1;
     }
 
     this.TestCaseList.splice(Index,1);
+  }
+};
+
+//TestCase,TestCaseGrp，查询获得的AtomList都是Atom的集合
+function AtomGrpObj(ID,Name,Creator,Desc,ServerId,type){
+
+  this.ID = ID;
+  this.Name = Name;
+  this.AtomOperationList = [];
+  this.Creator = Creator;
+  this.Desc = Desc;
+  this.ServerId = ServerId;
+  this.type = type;
+}
+
+AtomGrpObj.prototype = {
+
+  GetID: function() {
+    return this.ID;
+  },
+
+  GetAtomList:function(){
+    return this.AtomOperationList;
+  },
+
+  AddAtom: function (Atom){
+
+    this.RemoveAtom(Atom.Name);
+    this.AtomOperationList.push(Atom);
+  },
+
+  RemoveAtom:function(Name){
+
+    if(this.AtomOperationList.length ===0){
+      console.log('AtomOperationList Empty');
+      return;
+    }
+
+    for(var Index in this.AtomOperationList){
+
+      if(this.AtomOperationList.hasOwnProperty(Index) && this.AtomOperationList[Index].Name === Name){
+        break;
+      }
+    }
+
+    if(Index === (this.AtomOperationList.length - 1).toString()){
+      console.log('No such AtomOperation Name='+Name);
+      return -1;
+    }
+
+    this.AtomOperationList.splice(Index,1);
   }
 };

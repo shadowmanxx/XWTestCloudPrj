@@ -2,10 +2,13 @@
  * Created by Administrator on 2015/9/15.
  */
 //模拟设备资源类
-function SimResource(ID,Majorid,Minorid){
+function SimResource(ID,Majorid,Minorid,status,name,ip){
   this.ID = ID;
   this.Majorid = Majorid;
   this.Minorid = Minorid;
+  this.Status = status;
+  this.Name = name;
+  this.Ip = ip;
   this.UI = new UI(ID);
   this.TaskListSession = '#Simres_list tbody';
 }
@@ -67,25 +70,24 @@ SimResource.prototype = {
       context: this,
       data:JSON.stringify(ReqContent),
 
-      success:this.ProcessCreateTask,
+      success:function (TaskInfo) {
+
+        if(TaskInfo.result === 0 && TaskInfo.message === 'success'){
+          this.CurTaskId = TaskInfo.task_id;
+          $(document).triggerHandler('TaskStart',[this.CurTaskId]);
+          this.QueryRunningLog(this.CurTaskId);
+        }
+        else{
+          alert('Create Task Failed Info: \nresult = '+ TaskInfo.result + '\nMessage = '+TaskInfo.message);
+          $(document).triggerHandler('TaskEnd');
+        }
+      },
+
       error: function() {
+        $(document).triggerHandler('TaskEnd');
         console.log('Create Task Failed, Resource MajorId:'+this.GetMajorId()+' MinorId:'+this.GetMinorId());
       }
     });
-  },
-
-  ProcessCreateTask: function (TaskInfo) {
-
-    if(TaskInfo.result === 0 && TaskInfo.message === 'success')
-    {
-      this.CurTaskId = TaskInfo.task_id;
-      this.UI.InsetTaskToList(this.CurTaskId);
-      this.QueryRunningLog(this.CurTaskId);
-    }
-    else
-    {
-      console.log('Create Task Failed Info: \nresult = '+ TaskInfo.result + '\nMessage = '+TaskInfo.message);
-    }
   },
 
   QueryResHistory:function(){
@@ -118,34 +120,39 @@ SimResource.prototype = {
 
   ProcessQueryResHandleHistory:function(ResHandleHistory){
     var HistoryContent = '';
+    var HistoryContent_Hide = '';
     var TaskList = ResHandleHistory.task;
     var CurTime = null;
-
+    var TaskItem  = 0;
+    var TaskItem_Hide = 0;
+    var max = 0;
     this.UI.ClearDOMTextContent('#Log_ResHandleHistory');
-    if(TaskList.length === 0)
-    {
+    if(TaskList.length === 0){
       return;
     }
 
-    for(var TaskItem in TaskList)
-    {
+    for(TaskItem = 0,max = TaskList.length; (TaskItem < max) && (TaskItem <5);TaskItem++){
       CurTime = new Date(TaskList[TaskItem].date);
       HistoryContent += '<a style="white-space:pre" href="'+TaskList[TaskItem].log_file+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem].user +
         '   ExecTaskid：'+TaskList[TaskItem].id + '   Status：'+TaskList[TaskItem].status +
         '   Result：'+TaskList[TaskItem].result+'</a>';
     }
+
+    for(TaskItem_Hide = TaskItem,max = TaskList.length; TaskItem_Hide < max;TaskItem_Hide++){
+      CurTime = new Date(TaskList[TaskItem_Hide].date);
+      HistoryContent_Hide += '<a style="white-space:pre" href="'+TaskList[TaskItem_Hide].log_file+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem_Hide].user +
+        '   ExecTaskid：'+TaskList[TaskItem_Hide].id + '   Status：'+TaskList[TaskItem_Hide].status +
+        '   Result：'+TaskList[TaskItem_Hide].result+'</a>';
+    }
+
+
     this.UI.SetDOMHtmlContent('#Log_ResHandleHistory',HistoryContent);
-
-  },
-
-  AddResItemToList: function (itemdata) {
-
-    var template = null;
-    var Context = this;
-    template = this.UI.GenerateAndParseResTemplate(this.TaskListSession,itemdata,this.Majorid,this.Minorid);
-    template.click(function () {
-      Context.QueryResHistory();
+    $('<a class="text-success" href="#"><strong>更多</strong><span class="caret"></span></a>')
+      .appendTo('#Log_ResHandleHistory').click(function(){
+      this.remove();
+      $(HistoryContent_Hide).appendTo('#Log_ResHandleHistory');
     });
+
   },
 
   RemoveResItemFromList: function (){
@@ -189,27 +196,24 @@ SimResource.prototype = {
             }, 3000);
         }
       }
-      else if(TaskLog.status === "close")
-      {
-        //停止定时器
+      else if(TaskLog.status === "close"){
+
+        //停止轮询Log定时器
         if(this.CurTimerID != undefined)
         {
           clearInterval(this.CurTimerID);
-          clearInterval(this.UI.SpanFlashTimerID);
           this.CurTimerID = undefined;
-          this.UI.SpanFlashTimerID = undefined;
         }
-        $(document).trigger('CurTaskEnd');
+
         this.TaskStatusQuery(TaskLog.task_id);
       }
 
-      var LogSession = TaskLog.log;
-      if(LogSession.length === 0)
-      {
+      if(TaskLog.log.length === 0){
         return;
       }
 
-      this.UI.PrintLogToLogSession(LogSession,'#Log_TaskStatus');
+      $(document).triggerHandler('TaskRunningLogArrive',TaskLog);
+      //this.UI.PrintLogToLogSession(TaskLog.log,'#Log_TaskStatus');
     }
   },
 
@@ -229,24 +233,23 @@ SimResource.prototype = {
     context:this,
     data:JSON.stringify(ReqContent),
 
-    success:this.ProcessTaskStatusQuery,
+    success:function (TaskStatus){
+
+      if(TaskStatus.result === 0 && TaskStatus.message === 'success'){
+        $(document).triggerHandler('TaskEnd',[TaskStatus.task]);
+      }
+      else{
+        $(document).triggerHandler('TaskEnd',[TaskStatus.task]);
+        console.log('TaskStatus Query Result not successed,Taskid:' + task_id);
+      }
+    },
     error: function() {
-      alert("Get TaskId:"+task_id+" LogQuery Error!");
+      console.log("Get TaskId:"+task_id+" LogQuery Error!");
     }
   });
-},
+}
 
-  ProcessTaskStatusQuery:function (TaskStatus){
 
-    if(TaskStatus.result === 0 && TaskStatus.message === 'success')
-    {
-      this.UI.ChangeTaskStatus(TaskStatus.task);
-    }
-  },
-
-  SetChildObjProtoType: function () {
-    this.UI.__proto__ = UI.prototype;
-  }
 };
 
 

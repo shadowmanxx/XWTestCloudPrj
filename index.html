@@ -66,14 +66,12 @@ $(document).ready(function(){
             }),
 
             success:function(data) {
-              if(data.result === 0 && data.message === 'success')
-              {
-                $.cookie(cookie_session, data.xwsessionid );
-                $.cookie(cookie_username, usrname);
+              if(data.result === 0 && data.message === 'success'){
+                $.cookie(cookie_session, data.xwsessionid ,{expires: 7});
+                $.cookie(cookie_username, usrname,{expires: 7});
                 window.open("homepage.html","_self");
               }
-              else
-              {
+              else{
                 alert("验证失败\n"+"result: "+data.result+"\nmessage: "+data.message);
               }
 

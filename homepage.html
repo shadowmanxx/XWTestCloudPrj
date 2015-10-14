@@ -53,7 +53,7 @@
     <div class="row">
         <div class="col-md-3">
             <div class="panel-group" id="panel_TaskList">
-                <div class="panel panel-default" id="panel_module">
+                <div class="panel panel-default" style="display: none" id="panel_module">
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#panel_TaskList"
@@ -68,51 +68,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel panel-success">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#panel_TaskList"
-                               href="#panel_TaskItem_2">
-                                任务2 <span class="badge badge-success pull-right">成功</span>
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="panel_TaskItem_2" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            任务执行成功
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#panel_TaskList"
-                               href="#panel_TaskItem_3">
-                                任务3<span class="badge badge-info pull-right">提示</span>
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="panel_TaskItem_3" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            任务执行提示
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-warning">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#panel_TaskList"
-                               href="#panel_TaskItem_4">
-                                任务4<span class="badge badge-warning pull-right">警告</span>
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="panel_TaskItem_4" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            执行警告
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="col-md-9">
@@ -123,7 +78,6 @@
                     </a>
                 </li>
                 <li><a href="#Realres_list" data-toggle="tab">真实资源</a></li>
-
             </ul>
             <div id="ResTabContent" class="tab-content">
                 <div class="tab-pane fade in active" id="Simres_list">
