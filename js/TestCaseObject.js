@@ -3,13 +3,14 @@
  */
 
 //测试用例类
-function AtomObj(ID,Name,Creator,Description,SeverId){
+function AtomObj(ID,Name,Creator,Type,Description,SeverId){
 
   this.ID = ID;
   this.Name = Name;
   this.Creator = Creator;
   this.Descp = Description;
   this.SeverId = SeverId;
+  this.Type = Type;
   this.CfgPara = [];
 }
 
@@ -60,13 +61,13 @@ AtomObj.prototype = {
 
 
 //测试用例组类
-function TestCaseGrpObj(ID,Name,Creator,Attr,Desc,ServerId){
+function TestCaseGrpObj(ID,Name,Creator,Type,Desc,ServerId){
 
   this.ID = ID;
   this.Name = Name;
   this.TestCaseList = [];
   this.Creator = Creator;
-  this.Attr = Attr;
+  this.Type = Type;
   this.Desc = Desc;
   this.ServerId = ServerId;
 }
@@ -111,7 +112,7 @@ TestCaseGrpObj.prototype = {
 };
 
 //TestCase,TestCaseGrp，查询获得的AtomList都是Atom的集合
-function AtomGrpObj(ID,Name,Creator,Desc,ServerId,type){
+function AtomGrpObj(ID,Name,Creator,Desc,ServerId,Type,Category){
 
   this.ID = ID;
   this.Name = Name;
@@ -119,7 +120,8 @@ function AtomGrpObj(ID,Name,Creator,Desc,ServerId,type){
   this.Creator = Creator;
   this.Desc = Desc;
   this.ServerId = ServerId;
-  this.type = type;
+  this.Category = Category;
+  this.Type = Type;
 }
 
 AtomGrpObj.prototype = {
@@ -134,7 +136,6 @@ AtomGrpObj.prototype = {
 
   AddAtom: function (Atom){
 
-    this.RemoveAtom(Atom.Name);
     this.AtomOperationList.push(Atom);
   },
 

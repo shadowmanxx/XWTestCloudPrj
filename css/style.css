@@ -117,6 +117,11 @@ input{
 
 .TestCaseGrp #content .btn-toolbar{
     margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.TestCaseGrp #TestCaseManageTab{
+   margin-top: 30px;
 }
 
 .TestCaseGrp .ui-draggable a span{
@@ -125,4 +130,12 @@ input{
 
 .TestCaseGrp #content #TestCaseManageContent div{
   margin-top: 10px;
+}
+
+.TestCaseGrp .TestCasesPanel .panel-body li{
+  list-style-type:none;
+}
+
+.TestCaseGrp .TestCasesPanel .panel-body .dropdown-menu{
+  left: 77px;
 }

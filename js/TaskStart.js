@@ -21,7 +21,7 @@ function ParseTestCaseGrpSection(ResList){
   }
 }
 
-function TestCaseGrpLoaded(e,UsrObj){
+function TestCaseGrpLoaded(Type,UsrObj){
 
   if(UsrObj.TestCaseGrpList.length === 0){
     return;
@@ -105,7 +105,7 @@ function PageInit(){
 
   //TODO:查询设备状态和最近历史操作
 
-  Usr.QueryTestCaseGrp();
+  Usr.Query(TestCaseGrpLoaded,"TestCaseGrp");
 
   $('#BeginTest').click(function(){
 
@@ -155,7 +155,6 @@ function PageDestroy(){
 
 $(document).on('DocReady',PageInit);
 $(document).on('WindowDestroy',PageDestroy);
-$(document).on('TestCaseGrpLoaded',TestCaseGrpLoaded);
 $(document).on('TaskStart',TaskStart);
 $(document).on('TaskEnd',TaskEnd);
 $(document).on('TaskRunningLogArrive',TaskRunningLogArrive);
