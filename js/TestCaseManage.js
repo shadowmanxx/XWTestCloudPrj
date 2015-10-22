@@ -337,7 +337,7 @@ function RegisterClickEvent(id,Usr){
             el.find('a').attr({
               'data-toggle':"modal",
               'data-target':"#modal-container"
-            });
+            }).addClass("btn-danger");
           }
           //组件，测试用例展示包含的原子操作
           else{
@@ -353,7 +353,7 @@ function RegisterClickEvent(id,Usr){
         el.find("span").first().append(RemoveBtn);
 
         //闭包保存当前操作ID和实例,动态修改原子操作参数名称
-        (function(OperationObj,OperationType,el){
+        (function(OperationObj,OperationType,el,List){
           var Atom = null;
           var ParaItemTemplate = $('<div class="form-group">                                                  \
                                 <label for="para1" class="col-sm-3 control-label"></label>         \
@@ -368,6 +368,7 @@ function RegisterClickEvent(id,Usr){
             //原子操作才允许修改参数
             if(OperationType === "Atom"){
               var flag = true;
+              var context = this;
               $("#modal-container h4.modal-title").text(OperationObj.Name);
               $("#modal-container form").html("");
 
@@ -389,8 +390,9 @@ function RegisterClickEvent(id,Usr){
               $("#SavCfg").unbind("click").bind("click", function(event){
                 event.stopPropagation();
                 $("#modal-container form").find("input").each(function(index){
-
-                  if($(this).val() === "" && (OperationObj.CfgPara[index].Val === null|| OperationObj.CfgPara[index].Val ==="")){
+                  //BugFixed：从原始操作中读取参数是否是必填,List为原始列表
+                  var OriOperationVal = List[OperationObj.ID].CfgPara[index].Val;
+                  if($(this).val() === "" && (OriOperationVal === null|| OriOperationVal ==="")){
                     $(this).parent().parent().fadeOut(500).fadeIn(500);
                     flag = false;
                     return;
@@ -399,6 +401,7 @@ function RegisterClickEvent(id,Usr){
                 });
                 if(true === flag){
                   $('#modal-container').modal('hide');
+                  $(context).toggleClass("btn-danger",false);
                 }
                 else{
                   flag = true;
@@ -437,7 +440,7 @@ function RegisterClickEvent(id,Usr){
             }
 
           });
-        }(OperationObj,OperationType,el));
+        }(OperationObj,OperationType,el,List));
 
 
 
@@ -466,8 +469,10 @@ function RegisterClickEvent(id,Usr){
       window.open("TestCaseManage.html","_self");
     });
 
+     //定义模态框关闭时，若未填完参数，警告
 
      //用例组修改
+
      if(!isNaN(parseInt(OperationId))){
       var OpeSelected = null;
       var Location = '#drag-dropZone';
@@ -508,8 +513,8 @@ function RegisterClickEvent(id,Usr){
               $("#SavCfg").unbind("click").bind("click", function(event){
                 event.stopPropagation();
                 $("#modal-container form").find("input").each(function(index){
-
-                  if($(this).val() === "" && (OperationObj.CfgPara[index].Val === null|| OperationObj.CfgPara[index].Val ==="")){
+                  var OriOperationVal = Usr.AtomOperationList[OperationObj.ID].CfgPara[index].Val;
+                  if($(this).val() === "" && (OriOperationVal === null|| OriOperationVal ==="")){
                     $(this).parent().parent().fadeOut(500).fadeIn(500);
                     flag = false;
                     return;
@@ -562,8 +567,8 @@ function RegisterClickEvent(id,Usr){
                 $("#SavCfg").unbind("click").bind("click", function(event){
                   event.stopPropagation();
                   $("#modal-container form").find("input").each(function(index){
-
-                    if($(this).val() === "" && (OperationObj.CfgPara[index].Val === null|| OperationObj.CfgPara[index].Val ==="")){
+                    var OriOperationVal = Usr.AtomOperationList[OperationObj.ID].CfgPara[index].Val;
+                    if($(this).val() === "" && (OriOperationVal === null|| OriOperationVal ==="")){
                       $(this).parent().parent().fadeOut(500).fadeIn(500);
                       flag = false;
                       return;
@@ -700,6 +705,11 @@ function RegisterClickEvent(id,Usr){
         alert("请拖拽操作至提交区域");
         return;
       }
+      //为填写必填参数
+      if(true === $("#drag-dropZone").find("a").hasClass("btn-danger")){
+        alert("请填写参数");
+        return;
+      }
       ChangeCfgModalPage(id,null);
       $('#modal-container').modal('show');
 
@@ -738,6 +748,8 @@ function RegisterClickEvent(id,Usr){
         }
       });
     });
+
+
 }
 
 function MainPageResLoaded(Type,Usr,Result){
@@ -980,7 +992,7 @@ function PageInit(){
   Usr.TaskGrpAddPage = TaskGrpAddPage;
 
   //判断激活页面，查询元素,TODO:重构，不要每次都刷新页签的html
-  $("#TestCaseManageTab").children().each(function(){
+  $("#TestCaseManageTabHomepage").children().each(function(){
     var href = $(this).find("a[data-toggle=tab]").attr("href");
     var Type = "";
 
@@ -1021,11 +1033,11 @@ function PageInit(){
 
   });
 
-  $("#TestCaseManageTab > li:eq(0) > a").tab("show");
+  $("#TestCaseManageTabHomepage > li:eq(0) > a").tab("show");
 
   //页面控件事件注册
   $('#Create').click(function(event) {
-    var ModuleActive = $("#TestCaseManageTab > li.active a").attr("href");
+    var ModuleActive = $("#TestCaseManageTabHomepage > li.active a").attr("href");
     var ModuleId = "";
     switch (ModuleActive){
       case "#ComponentContent":

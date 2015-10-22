@@ -10,14 +10,10 @@ function UserLogout(){
   var cookie_UsrObj = 'UsrObj';
   $.ajax({
     type:"POST",
-    url:urlpara+ $.cookie(cookie_session),
+    url:urlpara,
     cache:false,
     dataType:'json',
     contentType:contentTypeStr,
-    data:JSON.stringify({
-      "xwsessionid":$.cookie(cookie_session)
-    }),
-
     success:function(data) {
       if(data.result === 0 && data.message === 'success')
       {

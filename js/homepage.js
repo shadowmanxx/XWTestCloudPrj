@@ -6,10 +6,10 @@ function GenerateSimResHtmlEle(itemData){
   //检查状态更新tr class样式
   switch(itemData.Status){
     case 'idle':
-      template.attr('class','success');
+      template.attr('class','');
       break;
-    case 'run':
-      template.attr('class','info');
+    case 'busy':
+      template.attr('class','warning');
       break;
   }
   template.attr('id','Sim_resitem' + itemData.ID);
@@ -66,15 +66,24 @@ function ResourceLoaded(e,UsrObj){
   if('#Simres_list' === Location) {
 
     ResList = UsrObj.SimResArray;
+    var LastContext = null;
     for (var item in ResList) {
       template = GenerateSimResHtmlEle(ResList[item]);
       $(template).appendTo('#Simres_list tbody');
 
-      !function(item){
+      (function(item){
         template.click(function (){
-        ResList[item].QueryResHistory();
+          if(LastContext !==null && LastContext !== this){
+            $(LastContext).toggleClass("info");
+          }
+          else if(LastContext === this){
+            return;
+          }
+          LastContext = this;
+          ResList[item].QueryResHistory();
+          $(this).toggleClass("info");
       });
-      }(item);
+      }(item));
 
       template.hide().show(1000);
     }
@@ -97,16 +106,12 @@ function PageInit(){
   setInterval(function(){
     Usr.RemoveAllRes();
     Usr.QueryResList();
-  }, 8000)
+  }, 10000)
 
 }
 
-function PageDestroy(){
-
-}
 
 $(document).on('DocReady',PageInit);
-$(document).on('WindowDestroy',PageDestroy);
 $(document).on('ResourceLoaded',ResourceLoaded);
 
 

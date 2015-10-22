@@ -107,6 +107,18 @@ input{
 .home-page .btn-block{
     margin-top: 10px;
 }
+.home-page #UploadFile+p {
+  margin-top: 10px;
+}
+.home-page #lte_app > span{
+  margin-left: 4px;
+  font-size: 15px;
+}
+.home-page #lte_db>span{
+  margin-left: 4px;
+  font-size: 16px;
+}
+
 .TestCaseGrp .TestCasesPanel{
   margin-top: 8px;
 }
@@ -120,7 +132,7 @@ input{
     margin-bottom: 20px;
 }
 
-.TestCaseGrp #TestCaseManageTab{
+.TestCaseGrp #TestCaseManageTabHomepage{
    margin-top: 30px;
 }
 
@@ -139,3 +151,4 @@ input{
 .TestCaseGrp .TestCasesPanel .panel-body .dropdown-menu{
   left: 77px;
 }
+

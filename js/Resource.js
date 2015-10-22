@@ -41,20 +41,78 @@ SimResource.prototype = {
     return this.ID;
   },
 
-  CreateTask: function () {
+  QueryRunningLog: function(callback,task_id,log_id){
+    var ReqContent = {
+      "":""
+    };
+    var contentTypeStr = 'application/json;charset=UTF-8';
+    var urlpara = '/front/task/log/'+ task_id +"/"+log_id;
+
+    $.ajax({
+      type:"GET",
+      url:urlpara,
+      cache:false,
+      dataType:'json',
+      contentType:contentTypeStr,
+      context:this,
+      data:JSON.stringify(ReqContent),
+
+      success:function (TaskLog){
+
+        if(TaskLog.result !== 0 && TaskLog.message !== 'success')        {
+          return;
+        }
+
+        callback(TaskLog,this);
+
+      },
+      error: function() {
+        console.log("Get TaskId:"+task_id+" LogQuery Error!");
+      }
+    });
+  },
+
+  TaskStatusQuery: function(task_id,callback){
+    var ReqContent = {
+      "":""
+    };
+    var contentTypeStr = 'application/json;charset=UTF-8';
+    var urlpara = '/front/task/info/'+ task_id;
+
+    $.ajax({
+      type:"GET",
+      url:urlpara,
+      cache:false,
+      dataType:'json',
+      contentType:contentTypeStr,
+      context:this,
+      data:JSON.stringify(ReqContent),
+
+      success:function (TaskStatus){
+        callback(TaskStatus);
+      },
+      error: function() {
+        console.log("Get TaskId:"+task_id+" LogQuery Error!");
+      }
+    });
+  },
+
+  CreateTask: function (Para,callback) {
 
     if (this.Majorid == null || this.Minorid == null) {
       return;
     }
 
-    var cookie_session = 'xwsessionid';
     var ReqContent = {
-      "xwsessionid": $.cookie(cookie_session),
+      "user": $.cookie('username'),
       "type":"simulation",
       "reversion":"",
       "code_path":"",
-      "test_group":"",
-      "resource":{"major_id":this.GetMajorId().toString(), "minor_id":this.GetMinorId().toString()}
+      "test_group":Para.TestGrpName,
+      "resource":{"major_id":this.GetMajorId().toString(), "minor_id":this.GetMinorId().toString()},
+      "exe_file":Para.UpLoadPath.lte_app,
+      "db_file":Para.UpLoadPath.lte_db
+
     };
     var contentTypeStr = 'application/json;charset=UTF-8';
     var urlpara = '/front/task';
@@ -71,11 +129,11 @@ SimResource.prototype = {
       data:JSON.stringify(ReqContent),
 
       success:function (TaskInfo) {
-
+        var LogHandler = null;
         if(TaskInfo.result === 0 && TaskInfo.message === 'success'){
           this.CurTaskId = TaskInfo.task_id;
-          $(document).triggerHandler('TaskStart',[this.CurTaskId]);
-          this.QueryRunningLog(this.CurTaskId);
+          LogHandler = callback(TaskInfo);
+          this.QueryRunningLog(LogHandler,this.CurTaskId,0);
         }
         else{
           alert('Create Task Failed Info: \nresult = '+ TaskInfo.result + '\nMessage = '+TaskInfo.message);
@@ -157,97 +215,8 @@ SimResource.prototype = {
 
   RemoveResItemFromList: function (){
     this.UI.RemoveResTemplate(this.TaskListSession,this.ID);
-  },
+  }
 
-  QueryRunningLog: function(task_id){
-    var ReqContent = {
-      "":""
-    };
-    var contentTypeStr = 'application/json;charset=UTF-8';
-    var urlpara = '/front/task/log/'+ task_id + '/0';
-
-    $.ajax({
-      type:"GET",
-      url:urlpara,
-      cache:false,
-      dataType:'json',
-      contentType:contentTypeStr,
-      context:this,
-      data:JSON.stringify(ReqContent),
-
-      success:this.ProcessTaskLogQuery,
-      error: function() {
-        console.log("Get TaskId:"+task_id+" LogQuery Error!");
-      }
-    });
-  },
-
-  ProcessTaskLogQuery: function (TaskLog){
-
-    if(TaskLog.result === 0 && TaskLog.message === 'success')
-    {
-      if(TaskLog.status === "run")
-      {
-        if(this.CurTimerID == undefined)
-        {
-          var Context = this;
-          this.CurTimerID = setInterval(function () {
-              Context.QueryRunningLog(Context.CurTaskId);
-            }, 3000);
-        }
-      }
-      else if(TaskLog.status === "close"){
-
-        //停止轮询Log定时器
-        if(this.CurTimerID != undefined)
-        {
-          clearInterval(this.CurTimerID);
-          this.CurTimerID = undefined;
-        }
-
-        this.TaskStatusQuery(TaskLog.task_id);
-      }
-
-      if(TaskLog.log.length === 0){
-        return;
-      }
-
-      $(document).triggerHandler('TaskRunningLogArrive',TaskLog);
-      //this.UI.PrintLogToLogSession(TaskLog.log,'#Log_TaskStatus');
-    }
-  },
-
-  TaskStatusQuery: function(task_id){
-  var ReqContent = {
-    "":""
-  };
-  var contentTypeStr = 'application/json;charset=UTF-8';
-  var urlpara = '/front/task/info/'+ task_id;
-
-  $.ajax({
-    type:"GET",
-    url:urlpara,
-    cache:false,
-    dataType:'json',
-    contentType:contentTypeStr,
-    context:this,
-    data:JSON.stringify(ReqContent),
-
-    success:function (TaskStatus){
-
-      if(TaskStatus.result === 0 && TaskStatus.message === 'success'){
-        $(document).triggerHandler('TaskEnd',[TaskStatus.task]);
-      }
-      else{
-        $(document).triggerHandler('TaskEnd',[TaskStatus.task]);
-        console.log('TaskStatus Query Result not successed,Taskid:' + task_id);
-      }
-    },
-    error: function() {
-      console.log("Get TaskId:"+task_id+" LogQuery Error!");
-    }
-  });
-}
 
 
 };
