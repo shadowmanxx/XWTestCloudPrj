@@ -12,46 +12,140 @@ function TaskStatusHandle(TaskStatus){
   var Res = null;
   var MajorId = null;
   var MinorId = null;
-  var Info = {
-    TaskInfo:{
-      id:$("#TaskId > span.badge"),
-      status:$("#TaskStatus > span.badge"),
-      date:$("#CreateTime > span.badge"),
-      user:$("#CreateUsr > span.badge"),
-      test_group:$("#ExecTestGrp > span.badge"),
-      result:$("#ExecResult > span.badge"),
-      logs:$("#Log_TaskStatus")
+  var InfoHandler = {
+    TaskInfoHandler:{
+      id:function(text){
+        $("#TaskId > span.badge").text(text);} ,
+      status:function(text){
+        if(text === "run"){
+          $("#TaskStatus > span.badge").text("运行中").attr("class","badge badge-info");
+          //TODO:实时展示运行步骤
+        }
+        else if(text === "close"){
+          $("#TaskStatus > span.badge").text("完成").attr("class","badge badge-success");
+        }
+        else{
+          $("#TaskStatus > span.badge").text("未知").attr("class","badge badge-warning");
+        }
+      } ,
+      date:function(text){
+        $("#CreateTime > span.badge").text((new Date(text)).toLocaleString());},
+      user:function(text){
+        $("#CreateUsr > span.badge").text(text);
+      } ,
+      test_group: function(text){
+        $("#ExecTestGrp > span.badge").text(text);
+      },
+      result:function(text){
+        if(text === "fail"){
+          $("#ExecResult > span.badge").text("失败").attr("class","badge badge-important");
+        }
+        else if(text === "success"){
+          $("#ExecResult > span.badge").text("成功").attr("class","badge badge-success");
+        }
+        else{
+          $("#ExecResult > span.badge").text("未知").attr("class","badge badge-warning");
+        }
+      } ,
+      logs:function(Log){
+        if(Log.length ===0){
+          return;
+        }
+        for(var LogItem in Log){
+          if(Log.hasOwnProperty(LogItem)){
+            $('#Log_TaskStatus').append((Log[LogItem].content));
+          }
+        }
+      },
+      log_file:function(LogFileHref){
+        if(LogFileHref!= ""){
+          $("#LogDownload").attr("href",LogFileHref);
+        }
+
+      },
+      run_time:function(time){
+        $("#RunTime > span.badge").text(time/1000+"s");
+      }
       //step:null,
       //task_fail_message:null
     },
-    DevInfo:{
+    DevInfoHandler:{
       Major:{
-        major_id:$("#MajorId > span.badge"),
-        type:$("#Env > span.badge"),
-        name:$("#MajorName > span.badge"),
-        ip:$("#IPAddr > span.badge"),
-        desc:$("#Desc > span.badge"),
-        cpu:$("#CPUCost > span.badge"),
-        mem:$("#MemCost > span.badge"),
-        uptime:$("#PowerOnTime > span.badge"),
-        hostname:$("#HostName > span.badge"),
-        platfrom:$("#OpeTime > span.badge"),
-        register_date:$("#RegisterTime > span.badge"),
-        status:$("#MajorStatus > span.badge")
+        major_id:function(text){
+          $("#MajorId > span.badge").text(text);},
+        type:function(text){
+          $("#Env > span.badge").text(text);},
+        name:function(text){
+          $("#MajorName > span.badge").text(text);},
+        ip:function(text){
+          $("#IPAddr > span.badge").text(text);},
+        desc:function(text){
+          $("#Desc > span.badge").text(text);},
+        cpu:function(text){
+          $("#CPUCost > span.badge").text(text+"%");
+          if(parseInt(text) > 60){
+            $("#CPUCost > span.badge").attr("class","badge badge-warning")
+          }
+        },
+        mem:function(text){
+          $("#MemCost > span.badge").text(text+"%");
+          if(parseInt(text) > 60){
+            $("#MemCost > span.badge").attr("class","badge badge-warning")
+          }
+        },
+        uptime:function(text){
+          $("#PowerOnTime > span.badge").text(text+"s");
+        },
+        hostname:function(text){
+          $("#HostName > span.badge").text(text);
+        },
+        platfrom:function(text){
+          $("#OpeType > span.badge").text(text);
+        },
+        register_date:function(text){
+          $("#RegisterTime > span.badge").text((new Date(text)).toLocaleString());
+        },
+        status:function(text){
+          if(text === "lost"){
+            $("#MajorStatus > span.badge").text("失联").attr("class","badge badge-important");
+          }
+          else if(text === "normal"){
+            $("#MajorStatus > span.badge").text("正常").attr("class","badge badge-success");
+          }
+
+        }
       },
       Minor:{
-        enbID:$("#EnbID > span.badge"),
-        enbName:$("#EnbName > span.badge"),
-        epcip:$("#EpcIp > span.badge"),
-        ip:$("#LocalIp > span.badge"),
-        minor_id:$("#MinorId > span.badge"),
-        pdnip:$("#PdnIp > span.badge"),
-        status:$("#MinorStatus > span.badge")
+        enbID:function(text){
+          $("#EnbID > span.badge").text(text);
+        },
+        enbName:function(text){
+          $("#EnbName > span.badge").text(text);
+        },
+        epcip:function(text){
+          $("#EpcIp > span.badge").text(text);
+        },
+        ip:function(text){
+          $("#LocalIp > span.badge").text(text);
+        },
+        minor_id:function(text){
+          $("#MinorId > span.badge").text(text);
+        },
+        pdnip:function(text){
+          $("#PdnIp > span.badge").text(text);
+        },
+        status:function(text){
+          if(text === "idle"){
+            $("#MinorStatus > span.badge").text("空闲").attr("class","badge badge-success");
+          }
+          else if(text === "busy"){
+            $("#MinorStatus > span.badge").text("运行").attr("class","badge badge-warning");
+          }
+        }
       }
 
     }
   };
-  var Log = null;
 
   if(TaskStatus.task.resource.major_id !=null && TaskStatus.task.resource.minor_id !=null){
     MajorId = parseInt(TaskStatus.task.resource.major_id);
@@ -61,20 +155,8 @@ function TaskStatusHandle(TaskStatus){
   }
 
   for(TaskItem in TaskStatus.task){
-    if(TaskStatus.task.hasOwnProperty(TaskItem) && Info.TaskInfo.hasOwnProperty(TaskItem)){
-      Info.TaskInfo[TaskItem].text(TaskStatus.task[TaskItem]);
-    }
-  }
-  //修改任务相关标签展示
-  if(Info.TaskInfo.result.text() === "fail"){
-    Info.TaskInfo.result.attr("class","badge badge-important");
-  }
-  $("#DownloadLog").attr("href",TaskStatus.task.log_file);
-
-  Log = Info.TaskInfo.logs;
-  for(LogItem in Log){
-    if(Log.hasOwnProperty(LogItem)){
-      $('#Log_TaskStatus').append((Log[LogItem].content));
+    if(TaskStatus.task.hasOwnProperty(TaskItem) && InfoHandler.TaskInfoHandler.hasOwnProperty(TaskItem)){
+      InfoHandler.TaskInfoHandler[TaskItem](TaskStatus.task[TaskItem]);
     }
   }
 
@@ -83,8 +165,8 @@ function TaskStatusHandle(TaskStatus){
     var MinorRes = null;
 
     for(ResItem in DevInfo){
-      if(DevInfo.hasOwnProperty(ResItem) && Info.DevInfo.Major.hasOwnProperty(ResItem)){
-        Info.DevInfo.Major[ResItem].text(DevInfo[ResItem]);
+      if(DevInfo.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Major.hasOwnProperty(ResItem)){
+        InfoHandler.DevInfoHandler.Major[ResItem](DevInfo[ResItem]);
       }
     }
 
@@ -95,8 +177,8 @@ function TaskStatusHandle(TaskStatus){
     }
 
     for(ResItem in MinorRes){
-      if(MinorRes.hasOwnProperty(ResItem) && Info.DevInfo.Minor.hasOwnProperty(ResItem)){
-        Info.DevInfo.Minor[ResItem].text(MinorRes[ResItem]);
+      if(MinorRes.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Minor.hasOwnProperty(ResItem)){
+        InfoHandler.DevInfoHandler.Minor[ResItem](MinorRes[ResItem]);
       }
     }
   }
