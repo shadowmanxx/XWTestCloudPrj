@@ -14,6 +14,7 @@ function UsrObj(name,sessionid){
   this.AtomOperationList = [];
   this.TestCaseList = [];
   this.ComponetList = [];
+  this.LastClickResID = null;
 }
 
 //定义方法

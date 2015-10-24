@@ -9,7 +9,7 @@ function GenerateSimResHtmlEle(itemData){
       template.attr('class','');
       break;
     case 'busy':
-      template.attr('class','warning');
+      template.attr('class','info');
       break;
   }
   template.attr('id','Sim_resitem' + itemData.ID);
@@ -56,17 +56,18 @@ function ParseElement(Location,item){
 }
 
 //特定页面资源加载成功后操作
-function ResourceLoaded(e,UsrObj){
+function ResourceLoaded(e,Usr){
 
   //判断模拟/真实激活状态，确定绘制哪个页面
   var Location = $('#ResTab').children('li.active').children('a').attr('href');
   var ResList = null;
   var template = null;
-
+  var LastContextID = Usr.LastClickResID;
+  var LastContext = null;
   if('#Simres_list' === Location) {
 
-    ResList = UsrObj.SimResArray;
-    var LastContext = null;
+    ResList = Usr.SimResArray;
+
     for (var item in ResList) {
       template = GenerateSimResHtmlEle(ResList[item]);
       $(template).appendTo('#Simres_list tbody');
@@ -74,22 +75,26 @@ function ResourceLoaded(e,UsrObj){
       (function(item){
         template.click(function (){
           if(LastContext !==null && LastContext !== this){
-            $(LastContext).toggleClass("info");
+            $(LastContext).toggleClass("warning");
           }
           else if(LastContext === this){
             return;
           }
           LastContext = this;
           ResList[item].QueryResHistory();
-          $(this).toggleClass("info");
+          $(this).toggleClass("warning");
       });
       }(item));
 
       template.hide().show(1000);
     }
+    if(LastContextID !==null){
+      LastContext = $("#Simres_list tbody tr:eq("+LastContextID+")").toggleClass("warning",true);
+
+    }
   }
   else if('#Realres_list' === Location){
-    ResList = UsrObj.RealResArray;
+    ResList = Usr.RealResArray;
   }
   else{
     console.log('Unknown Location To Insert');
@@ -104,6 +109,10 @@ function PageInit(){
   Usr.QueryResList();
 
   setInterval(function(){
+    var SelectedItem = $("#Simres_list tbody tr.warning");
+    if(SelectedItem.length !==0){
+      Usr.LastClickResID = SelectedItem.index();
+    }
     Usr.RemoveAllRes();
     Usr.QueryResList();
   }, 10000)

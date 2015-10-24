@@ -90,6 +90,7 @@ SimResource.prototype = {
 
       success:function (TaskStatus){
         callback(TaskStatus);
+
       },
       error: function() {
         console.log("Get TaskId:"+task_id+" LogQuery Error!");
@@ -191,14 +192,14 @@ SimResource.prototype = {
 
     for(TaskItem = 0,max = TaskList.length; (TaskItem < max) && (TaskItem <5);TaskItem++){
       CurTime = new Date(TaskList[TaskItem].date);
-      HistoryContent += '<a style="white-space:pre" href="'+TaskList[TaskItem].log_file+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem].user +
+      HistoryContent += '<a style="white-space:pre" href="TaskInfo.html?TaskId='+TaskList[TaskItem].id+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem].user +
         '   ExecTaskid：'+TaskList[TaskItem].id + '   Status：'+TaskList[TaskItem].status +
         '   Result：'+TaskList[TaskItem].result+'</a>';
     }
 
     for(TaskItem_Hide = TaskItem,max = TaskList.length; TaskItem_Hide < max;TaskItem_Hide++){
       CurTime = new Date(TaskList[TaskItem_Hide].date);
-      HistoryContent_Hide += '<a style="white-space:pre" href="'+TaskList[TaskItem_Hide].log_file+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem_Hide].user +
+      HistoryContent_Hide += '<a style="white-space:pre" href="TaskInfo.html?TaskId='+TaskList[TaskItem_Hide].id+'">'+ CurTime.toLocaleString() + '     '+ TaskList[TaskItem_Hide].user +
         '   ExecTaskid：'+TaskList[TaskItem_Hide].id + '   Status：'+TaskList[TaskItem_Hide].status +
         '   Result：'+TaskList[TaskItem_Hide].result+'</a>';
     }
@@ -215,6 +216,37 @@ SimResource.prototype = {
 
   RemoveResItemFromList: function (){
     this.UI.RemoveResTemplate(this.TaskListSession,this.ID);
+  },
+
+  QueryInfo:function(callback){
+    var urlpara = '/front/resource?major_id=';
+
+    if(this.Majorid ==null ||typeof this.Majorid !=="number" || this.Minorid ==null ||typeof this.Minorid !=="number"){
+      console.log("ResHasNo majorId,MinorId");
+      return;
+    }
+    urlpara+=this.Majorid;
+
+    $.ajax({
+      type:"GET",
+      url:urlpara,
+      cache:false,
+      dataType:'json',
+      contentType:"application/json;charset=UTF-8",
+      context:this,
+      success:function(ResInfo) {
+        if(ResInfo.result == -1){
+          console.log(ResInfo.message);
+          return;
+        }
+
+        callback(ResInfo[0],this.Minorid);
+      },
+      error: function() {
+        console.log("Resource info Fetch Error! MajorId = "+this.Majorid);
+      }
+    });
+
   }
 
 
