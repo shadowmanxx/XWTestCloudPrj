@@ -116,7 +116,7 @@ input{
 }
 
 
-.home-page,.TestCaseGrp{
+.home-page,.TestCaseGrp,.UserManage{
   margin-top:15px;
 }
 .home-page .nav-tabs{
@@ -208,5 +208,14 @@ input{
 
 .TestCaseGrp .TestCasesPanel .panel-body .dropdown-menu{
   left: 77px;
+}
+
+.UserManage label.UserVerifyError {
+  color: #FF0000;
+  font-size: 15px;
+}
+
+.UserManage input.UserVerifyError {
+  border-color: #c9302c;
 }
 

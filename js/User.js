@@ -3,6 +3,7 @@
  */
 
 //创建User命名空间，包含用户相关的所有结构
+
 function UsrObj(name,sessionid){
   this.name = name;
   this.sessionid = sessionid;

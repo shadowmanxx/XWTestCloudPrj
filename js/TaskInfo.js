@@ -2,16 +2,16 @@
  * Created by Administrator on 2015/10/22.
  */
 
-
-
-
 function TaskStatusHandle(TaskStatus){
 
   var TaskItem = null;
   var LogItem = null;
+  var ResItem = null;
   var Res = null;
   var MajorId = null;
   var MinorId = null;
+  var DevInfo = null;
+  var MinorRes = null;
   var InfoHandler = {
     TaskInfoHandler:{
       id:function(text){
@@ -53,15 +53,16 @@ function TaskStatusHandle(TaskStatus){
         }
         for(var LogItem in Log){
           if(Log.hasOwnProperty(LogItem)){
-            $('#Log_TaskStatus').append((Log[LogItem].content));
+            $('#Log_TaskStatus').append((Log[LogItem]));
           }
         }
       },
       log_file:function(LogFileHref){
-        if(LogFileHref!= ""){
-          $("#LogDownload").attr("href",LogFileHref);
+        if(LogFileHref==null || LogFileHref.length===0){
+          $("#LogDownload").removeClass("badge-info").addClass("badge-important");
+          return;
         }
-
+        $("#LogDownload").attr("href",LogFileHref);
       },
       run_time:function(time){
         $("#RunTime > span.badge").text(time/1000+"s");
@@ -150,36 +151,34 @@ function TaskStatusHandle(TaskStatus){
   if(TaskStatus.task.resource.major_id !=null && TaskStatus.task.resource.minor_id !=null){
     MajorId = parseInt(TaskStatus.task.resource.major_id);
     MinorId = parseInt(TaskStatus.task.resource.minor_id);
-    Res = new SimResource(0,MajorId ,MinorId);
-    Res.QueryInfo(ResHandle);
+  }
+  else{
+    console.log("resource id error,MajorId ="+TaskStatus.task.resource.major_id+" ,MinorId = "+TaskStatus.task.resource.minor_id);
   }
 
+  //任务信息展示
   for(TaskItem in TaskStatus.task){
     if(TaskStatus.task.hasOwnProperty(TaskItem) && InfoHandler.TaskInfoHandler.hasOwnProperty(TaskItem)){
       InfoHandler.TaskInfoHandler[TaskItem](TaskStatus.task[TaskItem]);
     }
   }
 
-  function ResHandle(DevInfo,MinorId){
-    var ResItem = null;
-    var MinorRes = null;
-
-    for(ResItem in DevInfo){
-      if(DevInfo.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Major.hasOwnProperty(ResItem)){
-        InfoHandler.DevInfoHandler.Major[ResItem](DevInfo[ResItem]);
-      }
+  //设备信息展示
+  DevInfo = JSON.parse(TaskStatus.task.resource_snapshot);
+  for(ResItem in DevInfo){
+    if(DevInfo.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Major.hasOwnProperty(ResItem)){
+      InfoHandler.DevInfoHandler.Major[ResItem](DevInfo[ResItem]);
     }
+  }
+  MinorRes = DevInfo.sub_resource[MinorId - 1];
+  if(MinorRes ==null || MinorRes.length===0){
+    console.log("MajorId="+DevInfo.major_id+"MinorId="+MinorId+"Has no Minor Information");
+    return;
+  }
 
-    MinorRes = DevInfo.sub_resource[MinorId - 1];
-    if(MinorRes ==null || MinorRes.length===0){
-      console.log("MajorId="+DevInfo.major_id+"MinorId="+MinorId+"Has no Minor Information");
-      return;
-    }
-
-    for(ResItem in MinorRes){
-      if(MinorRes.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Minor.hasOwnProperty(ResItem)){
-        InfoHandler.DevInfoHandler.Minor[ResItem](MinorRes[ResItem]);
-      }
+  for(ResItem in MinorRes){
+    if(MinorRes.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Minor.hasOwnProperty(ResItem)){
+      InfoHandler.DevInfoHandler.Minor[ResItem](MinorRes[ResItem]);
     }
   }
 }
@@ -201,7 +200,5 @@ function PageInit(){
   SimResource.prototype.TaskStatusQuery(TaskId,TaskStatusHandle);
 
 }
-
-
 
 $(document).on('DocReady',PageInit);
