@@ -2,6 +2,8 @@
  * Created by Administrator on 2015/9/15.
  */
 //模拟设备资源类
+
+
 function SimResource(ID,Majorid,Minorid,status,name,ip){
   this.ID = ID;
   this.Majorid = Majorid;

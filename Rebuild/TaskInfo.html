@@ -5,17 +5,19 @@
 <title>信威云测试平台</title>
   <link rel="stylesheet" href='css/bootstrap.min.css'>
   <link rel="stylesheet" href="css/style.css" media="screen">
-
-  <script src="js/jquery.min.js"></script>
-  <script src="js/jquery.cookie.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/jquery.getParams.js"></script>
-  <script src="js/User.js"></script>
-  <script src="js/Resource.js"></script>
-  <script src="js/UI.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/TestCaseObject.js"></script>
-  <script src="js/TaskInfo.js"></script>
+  <script src="js/lib/require.js"></script>
+  <script>
+    //Load common code that includes config, then load the app
+    //logic for this page. Do the requirejs calls here instead of
+    //a separate file so after a build there are only 2 HTTP
+    //requests instead of three.
+    requirejs(['./js/commoncfg'], function (common) {
+      //js/common sets the baseUrl to be js/ so
+      //can just ask for 'app/main1' here instead
+      //of 'js/app/main1'
+      requirejs(['app/TaskInfo']);
+    });
+  </script>
 </head>
 
 <body class="home-page">
@@ -28,8 +30,8 @@
           </div>
           <ul class="nav navbar-nav pull-right">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <script>document.write($.cookie('username'))</script>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="LogoutPanel">
+                <span></span>
                 <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">

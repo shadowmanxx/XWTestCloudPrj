@@ -154,16 +154,16 @@ function TaskStatusHandle(TaskStatus){
   }
   else{
     console.log("resource id error,MajorId ="+TaskStatus.task.resource.major_id+" ,MinorId = "+TaskStatus.task.resource.minor_id);
+
   }
 
-  //任务信息展示
   for(TaskItem in TaskStatus.task){
     if(TaskStatus.task.hasOwnProperty(TaskItem) && InfoHandler.TaskInfoHandler.hasOwnProperty(TaskItem)){
       InfoHandler.TaskInfoHandler[TaskItem](TaskStatus.task[TaskItem]);
     }
   }
 
-  //设备信息展示
+  //处理设备信息
   DevInfo = JSON.parse(TaskStatus.task.resource_snapshot);
   for(ResItem in DevInfo){
     if(DevInfo.hasOwnProperty(ResItem) && InfoHandler.DevInfoHandler.Major.hasOwnProperty(ResItem)){

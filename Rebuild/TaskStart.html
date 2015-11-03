@@ -6,19 +6,12 @@
   <link rel="stylesheet" href='css/bootstrap.min.css'>
   <link rel="stylesheet" href="css/style.css" media="screen">
 
-  <script src="js/jquery.min.js"></script>
-  <script src="js/jquery.cookie.js"></script>
-  <script src="js/jquery.ui.widget.js"></script>
-  <script src="js/jquery.iframe-transport.js"></script>
-  <script src="js/jquery.fileupload.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/jquery.getParams.js"></script>
-  <script src="js/User.js"></script>
-  <script src="js/UI.js"></script>
-  <script src="js/Resource.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/TestCaseObject.js"></script>
-  <script src="js/TaskStart.js"></script>
+  <script src="js/lib/require.js"></script>
+  <script>
+    requirejs(['./js/commoncfg'], function (common) {
+      requirejs(['app/TaskStart']);
+    });
+  </script>
 </head>
 
 <body class="home-page">
@@ -31,8 +24,8 @@
           </div>
           <ul class="nav navbar-nav pull-right">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <script>document.write($.cookie('username'))</script>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="LogoutPanel">
+                <span></span>
                 <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">

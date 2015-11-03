@@ -34,6 +34,7 @@ AtomObj.prototype = {
       Comment:comment,
       Type:type       //标示字段是否必填
     });
+
   },
 
   RemovePara:function(Name){

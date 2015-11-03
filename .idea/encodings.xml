@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Rebuild/AtomGrpObj.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/AtomObj.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/ResourceRebuild.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/TaskInfo.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/TestCaseGrpObj.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/js/app/TaskStart.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/js/app/TestCaseManage.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/js/app/UserManage.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/js/app/homepage.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Rebuild/js/common.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/js/Resource.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/js/TaskInfo.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/js/TaskStart.js" charset="UTF-8" />
