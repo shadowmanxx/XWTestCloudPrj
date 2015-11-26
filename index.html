@@ -16,7 +16,11 @@
 $(document).ready(function(){
 
   //Jquery Validation配置
-  $("#IndexCarousel").carousel('cycle');
+  $("#IndexCarousel").carousel({
+      interval: 8000,
+      pause:false
+  }).carousel('cycle');
+
   var validator = $("#form-login").validate({
     debug: true,
     rules: {
@@ -109,7 +113,7 @@ $(document).ready(function(){
             </span>
             <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码" >
         </div>
-        <p id="error-container" style="margin-bottom: 0px"></p>
+        <p id="error-container" style="margin-bottom: 0"></p>
         <input class="btn btn-primary btn-block btn-login" type = "submit" id="login_btn" value="登陆"/>
     </form>
 </div>

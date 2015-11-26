@@ -81,8 +81,12 @@ define(function(require){
                           <div class="panel-body">\
                           </div>\
                         </div>\
-                        </div>');
-
+                        </div>'),
+        ResIndex = {
+          BBUIndex:0,
+          RRUIndex:0,
+          UEIndex:0
+        };
 
     $.each(SubResList,function(Index,Res){
       var CurModule = template.clone(),
@@ -91,18 +95,20 @@ define(function(require){
       if( Res.commonPara.Name === "ue"){
         return;
       }
-      GenerateDevTitleInfo(CurModule,Res);
+      GenerateDevTitleInfo(CurModule,Res,ResIndex);
 
       //生成资源可修改表格
       GenerateParaModifyTable(CurModuleBody,Res.specificPara);
+
       ParentContainer.append(CurModule);
 
     });
     $el.html(ParentContainer);
 
-    function GenerateDevTitleInfo(CurModule,Res){
+    function GenerateDevTitleInfo(CurModule,Res,ResIndex){
       var ResName = Res.commonPara.Name,
           ResTitle = "",
+          ResId = 0,
           StatusSpan = CurModule.find(".panel-title span"),
           ParaListSpan = [],
           panelBody = CurModule.find(".panel-body");
@@ -123,14 +129,18 @@ define(function(require){
       switch (ResName){
         case "bbu":
           ResTitle = "BBU";
+          ResId = "bbu_"+ResIndex.BBUIndex;
           ParaListSpan.push('<span class="badge">'+"EnbID:"+Res.specificPara.enbID+'</span>');
           ParaListSpan.push('<span class="badge">'+"EpcIP:"+Res.specificPara.epcip+'</span>');
+          ++ResIndex.BBUIndex;
           break;
         case "rru":
           ResTitle = "RRU";
+          ResId = "rru_"+ResIndex.RRUIndex;
           ParaListSpan.push('<span class="badge">'+"RackNo:"+Res.specificPara.u8RackNo+'</span>');
           ParaListSpan.push('<span class="badge">'+"ShelfNo:"+Res.specificPara.u8ShelfNo+'</span>');
           ParaListSpan.push('<span class="badge">'+"SlotNo:"+Res.specificPara.u8SlotNo+'</span>');
+          ++ResIndex.RRUIndex;
           break;
         case "ue":
           break;
@@ -138,8 +148,8 @@ define(function(require){
           break;
 
       }
-      CurModule.find("a[data-toggle=collapse]").text(ResTitle).attr("href","#"+ResName);
-      panelBody.parent().attr("id",ResName);
+      CurModule.find("a[data-toggle=collapse]").text(ResTitle).attr("href","#"+ResId);
+      panelBody.parent().attr("id",ResId);
       //将设备主要参数写入title中
 
       StatusSpan.before(ParaListSpan.join(''));

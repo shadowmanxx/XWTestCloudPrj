@@ -175,6 +175,10 @@ input{
 .home-page #TestCaseGrpSection_body .form-group{
   margin-bottom:0;
 }
+
+.home-page table a.btn{
+  margin-right: 7px;
+}
 .Level3{
   margin-left: 15px;
   background: #faf2cc;
