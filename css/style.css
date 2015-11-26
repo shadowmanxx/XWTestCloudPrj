@@ -13,29 +13,24 @@ a.label:hover,a.label:focus,a.badge:hover,a.badge:focus{color:#ffffff;text-decor
 .label-inverse[href],.badge-inverse[href]{background-color:#1a1a1a;}
 
 .login-page body {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
+ /* padding-top: 40px;
+  padding-bottom: 40px;*/
+  margin: 0;
+  height: 100%;
 }
 
 .login-page .login-title{
   margin-top:7%;
   margin-bottom:5%;
   color:#FFF;
-  font-family:"微软雅黑";
 }
 
 .login-page .form-signin {
-  max-width: 300px;
+  max-width: 320px;
   padding: 19px 29px 29px;
   margin: 0 auto 20px;
   background-color: #eee;
   border: 1px solid #e5e5e5;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-  -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
   box-shadow: 0 1px 2px rgba(0,0,0,.05);
 }
 .login-page .form-signin .form-signin-heading{
@@ -53,19 +48,13 @@ a.label:hover,a.label:focus,a.badge:hover,a.badge:focus{color:#ffffff;text-decor
 }
 
 .login-page .login-form {
-  position: relative;
-  padding-top: 60px;
-  -moz-transition: all 550ms ease-in-out;
-  -o-transition: all 550ms ease-in-out;
-  -webkit-transition: all 550ms ease-in-out;
-  transition: all 550ms ease-in-out;
+  position: absolute;
+  right:10%;
+  top:10%;
+  z-index:999;
 }
 .login-form .row{
   margin-bottom: 15px;
-  -moz-transition: all 550ms ease-in-out;
-  -o-transition: all 550ms ease-in-out;
-  -webkit-transition: all 550ms ease-in-out;
-  transition: all 550ms ease-in-out;
 }
 .login-form .btn{
   height:45px;
@@ -80,32 +69,13 @@ a.label:hover,a.label:focus,a.badge:hover,a.badge:focus{color:#ffffff;text-decor
   margin: 0 auto;
   text-align: center;
   padding: 20px 0;
-  -moz-transition: all 550ms ease-in-out;
-  -o-transition: all 550ms ease-in-out;
-  -webkit-transition: all 550ms ease-in-out;
   transition: all 550ms ease-in-out;
 }
-
-/*.login-page .login-form .input-group {
-  background: #373e4a;
-  height: auto;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  -moz-transition: all 300ms ease-in-out;
-  -o-transition: all 300ms ease-in-out;
-  -webkit-transition: all 300ms ease-in-out;
-  transition: all 300ms ease-in-out;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-}*/
 
 input{
   color: #000000;
 }
+
 #error-container .login-error{
   color: #FF0000;
   font-size: 20px;
@@ -116,9 +86,11 @@ input{
 }
 
 
-.home-page,.TestCaseGrp,.UserManage{
+.home-page,.TestCaseGrp,.UserManage,.RealResManage{
   margin-top:15px;
+  font-family: "宋体,微软雅黑,Arial,Verdana,arial,serif";
 }
+
 .home-page .nav-tabs{
   margin-top:30px;
   margin-bottom: 15px;
@@ -145,11 +117,8 @@ input{
 .home-page #MainRes .list-group{
   margin-bottom:0;
 }
-.home-page #Log_ResHandleHistory a{
-
-  #border-bottom: 1px solid #ccc;
-  display: block;
-  padding: 4px 20px 8px 20px;
+.home-page #Log_ResHandleHistory{
+  margin-bottom:30px;
 }
 
 .home-page .nav-tabs .active{
@@ -181,6 +150,39 @@ input{
   margin-left: 4px;
   font-size: 16px;
 }
+.home-page #bin>span{
+  margin-left: 4px;
+  font-size: 16px;
+}
+.home-page #VerSelectSection .panel-body #FileUploadSection blockquote p{
+  font-family: "华文楷体";
+}
+.home-page .jumbotron{
+  padding: 20px 0 20px 60px;
+}
+
+.home-page .page-header{
+  margin: 0;
+}
+.home-page .jumbotron h1{
+  font-family: "华文楷体";
+  font-size:40px;
+  margin-top:5px;
+}
+.home-page #Log_TaskStatus .viewport{
+  height: 380px;
+}
+.home-page #TestCaseGrpSection_body .form-group{
+  margin-bottom:0;
+}
+.Level3{
+  margin-left: 15px;
+  background: #faf2cc;
+}
+
+.TestCaseGrp nav .dropdown-menu{
+  min-width: 107px;
+}
 
 .TestCaseGrp .TestCasesPanel{
   margin-top: 8px;
@@ -198,16 +200,27 @@ input{
   white-space: normal;
 }
 
-.TestCaseGrp #content #TestCaseManageContent div{
-  margin-top: 10px;
-}
-
 .TestCaseGrp .TestCasesPanel .panel-body li{
   list-style-type:none;
 }
 
 .TestCaseGrp .TestCasesPanel .panel-body .dropdown-menu{
   left: 77px;
+}
+
+.TestCaseGrp input.UserVerifyError {
+  border-color: #c9302c;
+}
+
+.TestCaseGrp label.UserVerifyError {
+  color: #FF0000;
+  font-size: 15px;
+}
+.TestCaseGrp .update{
+  margin-right: 7px;
+}
+.UserManage nav .dropdown-menu{
+  min-width: 107px;
 }
 
 .UserManage label.UserVerifyError {
@@ -219,7 +232,14 @@ input{
   border-color: #c9302c;
 }
 
-.UserManage .btn-toolbar{
-  margin-top: 30px;
-  margin-bottom: 20px;
+
+
+.UserManage .update{
+  margin-right: 7px;
+}
+
+
+.RealResManage .table .detail-view .panel-default>.panel-heading span {
+  margin-left: 10px;
+  font-size: 16px;
 }

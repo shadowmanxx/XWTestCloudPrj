@@ -5,17 +5,13 @@
 <title>信威云测试平台</title>
   <link rel="stylesheet" href='css/bootstrap.min.css'>
   <link rel="stylesheet" href="css/style.css" media="screen">
-
-  <script src="js/jquery.min.js"></script>
-  <script src="js/jquery.cookie.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/jquery.getParams.js"></script>
-  <script src="js/User.js"></script>
-  <script src="js/Resource.js"></script>
-  <script src="js/UI.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/TestCaseObject.js"></script>
-  <script src="js/TaskInfo.js"></script>
+  <link rel="stylesheet" href="css/tinyscrollbar.css" media="screen">
+  <script src="js/lib/require.js"></script>
+  <script>
+    requirejs(['./js/commoncfg'], function (common) {
+      requirejs(['app/TaskInfo']);
+    });
+  </script>
 </head>
 
 <body class="home-page">
@@ -28,8 +24,8 @@
           </div>
           <ul class="nav navbar-nav pull-right">
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <script>document.write($.cookie('username'))</script>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="LogoutPanel">
+                <span></span>
                 <b class="caret"></b>
               </a>
               <ul class="dropdown-menu">
@@ -113,7 +109,19 @@
         <div class="row">
           <div class="col-md-12">
             <div class="page-header"><h2>日志信息</h2></div>
-            <textarea class="form-control" rows="10" id="Log_TaskStatus" placeholder="请关注Log打印" readonly></textarea>
+            <div class="well" id="Log_TaskStatus">
+              <div class="scrollbar">
+                <div class="track">
+                  <div class="thumb">
+                    <div class="end"></div>
+                    </div>
+                </div>
+              </div>
+              <div class="viewport">
+                <div class="overview" id="Log_TaskStatusContent">
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
