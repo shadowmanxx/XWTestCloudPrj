@@ -86,7 +86,7 @@ input{
 }
 
 
-.home-page,.TestCaseGrp,.UserManage,.RealResManage{
+.home-page,.TestCaseGrp,.UserManage,.RealResManage,.RealTimeInfo{
   margin-top:15px;
   font-family: "宋体,微软雅黑,Arial,Verdana,arial,serif";
 }
@@ -236,14 +236,23 @@ input{
   border-color: #c9302c;
 }
 
-
-
 .UserManage .update{
   margin-right: 7px;
 }
 
-
 .RealResManage .table .detail-view .panel-default>.panel-heading span {
   margin-left: 10px;
   font-size: 16px;
+}
+
+.RealTimeInfo .list-group-item small{
+  margin: 0 40px 0 5px;
+}
+
+.RealTimeInfo .list-group-item a{
+  margin-left: 10px;
+}
+
+.RealTimeInfo #EnbInfoList{
+  margin-top: 30px;
 }
