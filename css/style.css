@@ -179,6 +179,116 @@ input{
 .home-page table a.btn{
   margin-right: 7px;
 }
+
+.home-page  #EISection .EI_GeneralConfig .input-group-addon{
+  min-width: 83px;
+  height: 28px;
+  padding: 0;
+  background-color: #fee;
+  border-radius:0;
+}
+.home-page  #EISection .EI_GeneralConfig .MaxLenAddon{
+  min-width: 83px;
+  padding:0 6px 0 6px;
+}
+.home-page  #EISection .EI_GeneralConfig input{
+  height:28px;
+  padding-left: 5px;
+  border-radius:0;
+}
+
+.home-page  #EISection .EI_GeneralConfig .MaxLenInput{
+  padding: 0;
+}
+
+.home-page  #EISection .EI_GeneralConfig .col-md-3{
+  margin-top: 0;
+  padding-left: 0;
+}
+
+.home-page  #EISection .EI_GeneralState .col-md-3{
+  margin-top: 0;
+  padding-left: 0;
+}
+.home-page  #EISection .EI_GeneralState .input-group-addon{
+  height: 28px;
+  min-width: 83px;
+  padding: 0 6px 0 6px;
+  background-color: #fee;
+  border-radius:0;
+}
+.home-page  #EISection .EI_GeneralState .MaxLenAddon{
+  min-width: 78px;
+}
+.home-page  #EISection .EI_GeneralState input{
+  height:28px;
+  padding-left: 5px;
+  border-radius:0;
+}
+
+.home-page  #EISection .EI_GeneralState .MaxLenInput{
+  padding: 5px;
+}
+
+
+.home-page  #EISection .EI_DetailStateUl .col-md-4{
+  margin-top: 0;
+  padding-left: 0;
+}
+.home-page  #EISection .EI_DetailStateUl .input-group-addon{
+  height: 28px;
+  min-width: 125px;
+  padding: 0;
+  background-color: #fee;
+  border-radius:0;
+}
+.home-page  #EISection .EI_DetailStateUl .MaxLenAddon{
+  min-width: 100px;
+  padding: 6px;
+}
+.home-page  #EISection .EI_DetailStateUl input{
+  height:28px;
+  border-radius:0;
+}
+
+.home-page  #EISection .EI_DetailStateUl .MaxLenInput{
+  padding: 5px;
+}
+
+.home-page  #EISection .EI_DetailStateDl .col-md-4{
+  margin-top: 0;
+  padding-left: 0;
+}
+.home-page  #EISection .EI_DetailStateDl .input-group-addon{
+  height: 28px;
+  min-width: 125px;
+  padding: 0;
+  background-color: #fee;
+  border-radius:0;
+}
+.home-page  #EISection .EI_DetailStateDl .MaxLenAddon{
+  min-width: 100px;
+  padding: 6px;
+}
+.home-page  #EISection .EI_DetailStateDl input{
+  height:28px;
+  border-radius:0;
+}
+
+.home-page  #EISection .EI_DetailStateDl .MaxLenInput{
+  padding: 5px;
+}
+
+.home-page  #EISection #CellSelector{
+  margin-bottom: 30px;
+}
+.home-page  #EISection #UEInfoTable th{
+  font-weight: 100;
+  font-size: 11px;
+}
+.home-page  #EISection #UEInfoTable th .th-inner{
+  padding: 8px 3px 8px 3px;
+}
 .Level3{
   margin-left: 15px;
   background: #faf2cc;

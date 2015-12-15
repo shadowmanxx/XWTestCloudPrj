@@ -12,19 +12,28 @@ define(function(require){
 
   $(function(){
 
-    RealResLoadHandler();
+    $.ajax({
+      type:"GET",
+      url:"/front/subresource?all=1&type=bbu",
+      cache:false,
+      dataType:'json',
+      contentType:"application/json;charset=UTF-8",
+      context:this,
+      success:function(eNBInfo) {
+        if(eNBInfo.result !==0){
+          alert(eNBInfo.message);
+          return;
+        }
+        GenerateEnbList($EnbInfoList,eNBInfo.enblist);
+      },
+      error: function() {
+        $EnbInfoList.html("<h1>Query EnbList Error</h1>");
+        console.log("QueryEnbListError");
+        return;
+      }
+    });
 
   });
-
-  function RealResLoadHandler(){
-    var eNBInfoList = [
-      {enbID:4005,enbName:"xwcloudtest1",status:"lost"},
-      {enbID:4006,enbName:"xwcloudtest2",status:"normal"},
-      {enbID:4007,enbName:"xwcloudtest3",status:"lost"}
-    ];
-
-    GenerateEnbList($EnbInfoList,eNBInfoList);
-  }
 
   function GenerateEnbList($el,eNBInfoList) {
     var EnbInfoItem = null,
@@ -78,12 +87,12 @@ define(function(require){
 
       $IMSIListRow = $("<div class='row'></div>");
 
-      for(var IMSIIndex=0;IMSIIndex < CellInfo.ueinfolist.length;++IMSIIndex){
-        $("<a/>").attr("href", "#")
-          .text("*"+(CellInfo.ueinfolist[IMSIIndex].imsi%10000))
+      for(var IMSIIndex=0;IMSIIndex < CellInfo.uelist.length;++IMSIIndex){
+        $("<a/>").attr("href", "UERealTimeInfo.html?IMSI="+CellInfo.uelist[IMSIIndex].imsi)
+          .text("*"+(CellInfo.uelist[IMSIIndex].imsi%10000))
           .appendTo($IMSIListRow);
 
-        if((IMSIIndex+1) % 8 ===0 || IMSIIndex === CellInfo.ueinfolist.length-1){
+        if((IMSIIndex+1) % 8 ===0 || IMSIIndex === CellInfo.uelist.length-1){
           $IMSIDiv.append($IMSIListRow);
           $IMSIListRow = $("<div class='row'></div>");
         }
@@ -112,31 +121,43 @@ define(function(require){
       panelBody = CurModule.find(".panel-body");
 
     if(Res.status === "lost"){
-      StatusSpan.text("离线").toggleClass("badge-important",true);
+      StatusSpan.text("lost").toggleClass("badge-important",true);
     }
     else if(Res.status === "idle"){
-      StatusSpan.text("空闲").toggleClass("badge-success",true);
+      StatusSpan.text("idle").toggleClass("badge-success",true);
     }
     else if(Res.status === "busy"){
-      StatusSpan.text("忙碌").toggleClass("badge-warning",true);
+      StatusSpan.text("busy").toggleClass("badge-warning",true);
     }
     else{
-      StatusSpan.text("异常").toggleClass("badge-inverse",true);
+      StatusSpan.text("abnormal").toggleClass("badge-inverse",true);
     }
 
-    ParaListSpan.push('<span class="badge">'+"EpcIP:"+Res.ip+'</span>');
+    ParaListSpan.push('<span class="badge">'+"EpcIP:"+Res.enbIP+'</span>');
 
     CurModule.find("a[data-toggle=collapse]").text(ResId).attr("href","#"+ResId);
     panelBody.parent().attr("id",ResId).on('show.bs.collapse', function (e) {
-      var eNBInfo = {
-        enbid:1259,
-        cellinfolist:[
-          {cellid:252,ueinfolist:[{imsi:460000851236},{imsi:460000851237},{imsi:460000851256},{imsi:460000908999},{imsi:460000851237},{imsi:460000851237},{imsi:460000851256},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999},{imsi:460000908999},{imsi:460000851256},{imsi:460000908999}]},
-          {cellid:253,ueinfolist:[{imsi:460000851236},{imsi:460000851237},{imsi:460000851237},{imsi:460000851237}]},
-          {cellid:254,ueinfolist:[{imsi:460000851236}]}
-        ]
-      };
-      GenerateCellInfoSection(panelBody,eNBInfo);
+
+      $.ajax({
+        type:"GET",
+        url:"/front/subresource?type=bbu&id="+Res.enbid,
+        cache:false,
+        dataType:'json',
+        contentType:"application/json;charset=UTF-8",
+        context:this,
+        success:function(eNBInfo) {
+          if(eNBInfo.result !==0){
+            alert(eNBInfo.message);
+            return;
+          }
+          GenerateCellInfoSection(panelBody,eNBInfo);
+        },
+        error: function() {
+          console.log("QueryUEInfoError");
+        }
+      });
+
+
     });
     //将设备主要参数写入title中
 
