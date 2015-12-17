@@ -403,6 +403,7 @@ define(function(require){
           InitEICellInfo(CurEIData);
           CellId = $("#CellSelector input:checked").val();
           if(CellId !==null){
+            InitEIUeInfo(CurEIData[CellId]);
             UpdateEIData(CurEIData[CellId]);
           }
 
@@ -456,6 +457,65 @@ define(function(require){
         }
 
 
+      });
+
+      $("#EiCellInfoSelector").change(function(e){
+        var UeInfoPara = e.target.value,
+          ParaText = $(this).find("option:selected").text();
+
+        $("#EiCellInfoChart").data("CellInfo", {CellId:CellId,Para:UeInfoPara,ParaText:ParaText});
+        DrawCellInfoCharts(CurEIData[CellId],true);
+
+        if(callbacklist.DrawCellInfo ===null){
+          callbacklist.DrawCellInfo = DrawCellInfoCharts;
+        }
+      });
+
+      $("#EiUeGidSelector").focus(function(e){
+        var UeGidList = [],
+          Gid = null;
+
+        TableData = $("#UEInfoTable").bootstrapTable('getData');
+        for(var Ueitem=0; Ueitem < TableData.length;Ueitem++){
+          Gid = TableData[Ueitem].GID;
+          if($(this).find("option[value="+Gid+"]").length !==0){
+            continue;
+          }
+          UeGidList.push($("<option/>").text(Gid).val(Gid)[0].outerHTML);
+        }
+        $(this).append(UeGidList.join(''));
+      });
+
+      $("#EiUeGidSelector").change(function(e){
+        var UeGid = e.target.value,
+          $UeInfoChart =  $('#EiUeInfoChart').highcharts(),
+          UeInfoSaved = $("#EiUeInfoChart").data("UEInfo");
+        if(UeInfoSaved !==undefined){
+          UeInfoSaved.Gid = UeGid;
+          if($UeInfoChart !=null){
+            $UeInfoChart.setTitle(null, { text: 'Gid:'+UeGid});
+          }
+
+        }
+        else{
+          UeInfoSaved  = {Gid:UeGid}
+        }
+        $("#EiUeInfoChart").data("UEInfo",UeInfoSaved);
+        $("#EiUeInfoSelector").show(500);
+
+      });
+
+      $("#EiUeInfoSelector").change(function(e){
+        var UeInfoPara = e.target.value,
+          UeInfoSaved = $("#EiUeInfoChart").data("UEInfo"),
+          ParaText = $(this).find("option:selected").text();
+
+        $("#EiUeInfoChart").data("UEInfo", $.extend({},UeInfoSaved,{Para:UeInfoPara,ParaText:ParaText}));
+        DrawUeInfoCharts(CurEIData[CellId],true);
+
+        if(callbacklist.DrawUeInfo ===null){
+          callbacklist.DrawUeInfo = DrawUeInfoCharts;
+        }
       });
     }
 
@@ -686,6 +746,7 @@ define(function(require){
       //TODO:缓存当前CellID，请求成功后检查携带的CellID与缓存值的不同，若不同，触发小区CellId更新事件
       InitEICellInfo(CurEIData);
       CellId = $("#CellSelector input:checked").val();
+      InitEIUeInfo(CurEIData[CellId].ueGeneralList.ueDict);
       if(CellId !==null){
         UpdateEIData(CurEIData[CellId]);
       }
@@ -804,6 +865,215 @@ define(function(require){
         CellSelectorDOM[DisableIndx].parent().attr("disabled","disabled");
       }
 
+    }
+
+    function InitEIUeInfo(UeList){
+      var columns = [
+        {
+          field:"GID",
+          title:"GID",
+          align:"center",
+          halign:"center"
+
+        },
+        {
+          field:"IP",
+          title:"IP",
+          align:"center",
+          halign:"center"
+
+        },
+        {
+          field:"PL",
+          title:"PL",
+          align:"center",
+          halign:"center"
+
+        },
+        {
+          field:"TXDiv",
+          title:"TXDiv",
+          align:"center",
+          halign:"center"
+
+        },
+        {
+          field:"DTX",
+          title:"DTX",
+          align:"center",
+          halign:"center"
+
+        },
+        {
+          field:"UlMcs",
+          title:"Mcs",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlBler",
+          title:"Bler",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlRbNum",
+          title:"RbNum",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlHarqFail",
+          title:"HarqFail",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlHarqExpire",
+          title:"HarqExpire",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlHarqCnt",
+          title:"HarqCnt",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlShdCnt",
+          title:"ShdCnt",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlMacTput",
+          title:"MacTput",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"UlPdcpTput",
+          title:"PdcpTput",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-primary"}
+
+        },
+        {
+          field:"DlMcs",
+          title:"Mcs",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlBler",
+          title:"Bler",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlRbNum",
+          title:"RbNum",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlHarqFail",
+          title:"HarqFail",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlHarqExpire",
+          title:"HarqExpire",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlHarqCnt",
+          title:"HarqCnt",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlShdCnt",
+          title:"ShdCnt",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlMacTput",
+          title:"MacTput",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        },
+        {
+          field:"DlPdcpTput",
+          title:"PdcpTput",
+          align:"center",
+          halign:"center",
+          cellStyle:{classes:"text-success"}
+
+        }
+
+        ],
+          UeInfo = EIInfoDOM.UEInfo,
+          rowItem = [],
+          TableDataField = [];
+      if(UeList ==null || UeList.length ===0){
+        console.log("InitUeList is empty");
+        return;
+      }
+      for(var item in UeList){
+        if(UeList.hasOwnProperty(item)){
+          UeItem = UeList[item];
+          for(var Uepara in UeItem){
+            if(UeItem.hasOwnProperty(Uepara) && UeInfo.hasOwnProperty(Uepara)){
+              rowItem[UeInfo[Uepara]] = UeItem[Uepara];
+            }
+          }
+          TableDataField.push(rowItem);
+          rowItem = [];
+        }
+      }
+      $("#UEInfoTable").bootstrapTable({
+        uniqueId:"GID",
+        columns:columns,
+        data:TableDataField
+      });
     }
 
     function UpdateEIData(CellEiInfo){
