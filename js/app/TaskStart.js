@@ -14,6 +14,8 @@ define(function(require){
   require("bootstrap");
   require("bootstrap-table");
   require("jquery_tinyscrollbar");
+  require("highcharts");
+  require("sand_signika");
 
   var ResId = $.getURLParam('ResId'),
       ResType = $.getURLParam('ResType'),
@@ -127,8 +129,6 @@ define(function(require){
       Res = new SimRes({ID:ResId,major_id:MajorId,minor_id:MinorId});
       $("#FileUploadSection blockquote .text-info").text("请选择lte_app lte.db").next().text("临时版本").append($("<cite/>").text("lte_app lte.db"));
     }
-
-    TestEI();
 
     $("#VerUploadType").change(function(e){
       switch (e.target.selectedIndex){
@@ -375,9 +375,15 @@ define(function(require){
       });
     }());
 
+    TestAjax();
     function TestEI(taskid){
       var CurEIData = null,
         TimerInterval = 1000,
+        callbacklist = {
+          DrawUeInfo:null,
+          DrawCellInfo:null,
+          DrawNIInfo:DrawNICharts
+        },
         CellId = null;
 
       $.ajax({
@@ -393,9 +399,12 @@ define(function(require){
           }
 
           CurEIData = Result.ei_basic;
+          //TODO:缓存当前CellID，请求成功后检查携带的CellID与缓存值的不同，若不同，触发小区CellId更新事件
           InitEICellInfo(CurEIData);
-          CellId = $("#CellSelector input:checked").value();
-          UpdateEIData(CurEIData[CellId]);
+          CellId = $("#CellSelector input:checked").val();
+          if(CellId !==null){
+            UpdateEIData(CurEIData[CellId]);
+          }
 
           setInterval(function(){
             $.ajax({
@@ -405,6 +414,8 @@ define(function(require){
               dataType:'json',
               contentType:'application/json;charset=UTF-8',
               success:function(Result){
+                var Handler = null;
+
                 if(Result.result !==0){
                   alert(Result.message);
                   return;
@@ -412,7 +423,16 @@ define(function(require){
 
                 CurEIData = Result.ei_basic;
                 InitEICellInfo(CurEIData);
-                UpdateEIData(CurEIData[CellId]);
+                CellId = $("#CellSelector input:checked").val();
+                if(CellId !==null){
+                  UpdateEIData(CurEIData[CellId]);
+                }
+                for(var Item in callbacklist){
+                  if(callbacklist.hasOwnProperty(Item)){
+                    Handler = callbacklist[Item];
+                    Handler(CurEIData);
+                  }
+                }
               },
               error: function() {
                 console.log("QueryEiBasicInfo Error!");
@@ -427,10 +447,346 @@ define(function(require){
 
       $("#CellSelector input").change(function(e){
         CellId = e.currentTarget.value;
+        if(CellId !==null) {
+          UpdateEIData(CurEIData[CellId]);
+          DestroyCharts(callbacklist);
+        }
+        else{
+          console.log("CellId is null");
+        }
 
+
+      });
+    }
+
+    function TestAjax(){
+      var CurEIData = null,
+        TimerInterval = 1000,
+        Result = {
+          "result": 0,
+          "message": "success",
+          "ei_basic" : {
+            "254":{
+              "u8OpticPort":"8",
+              "cellGeneralCfg" : {
+                "u8CellID":"254",
+                "u32EnbId":"4250",
+                "u32CellCenterFreq":"65350",
+                "u16CellPCI":"189",
+                "u8CellBandWidth":"5M",
+                "u8CellULDLConfig":"1",
+                "u8CellSpecSubFramCfg":"7",
+                "u8CellULAntNum":"4",
+                "u8CellDLAntNum":"1"
+              },
+              "cellGeneralState" : {
+                "u16SFN":"1032",
+                "u16ActiveUENum":"1500",
+                "s16NI":"-600dbm",
+                "u8TXPower":"80dbm"
+              },
+              "cellULDetailState" : {
+                "u32ULMacThrput":"10M",
+                "u32ULPdcpThrput":"10M",
+                "u8ULRbRatio":"10%",
+                "u8ULAvrgShdUEForTTI":"14.1",
+                "u8ULAvrgHarqCnt":"1.0",
+                "u8ULAvrgBler":"10%",
+                "u16ULHarqFailRatio":"10%",
+                "u16ULHarqExpireRatio":"10%",
+                "u16ULAvrgMcs":"20",
+                "u16ULMaxSchdMcs":"30",
+                "u16ULHqRetSuccRate1":"10000%%",
+                "u16ULHqRetSuccRate2":"10000%%",
+                "u16ULHqRetSuccRate3":"10000%%",
+                "u16ULHqRetSuccRate4":"10000%%",
+                "s16NiRB":[-468, -467, -466, -465, -464, -463, -462, -461, -460, -459, -458, -457, -456, -455, -454, -453, -452, -451, -450, -449, -448, -447, -446, -445, -444, -443, -442, -441, -440, -439, -468, -467, -466, -465, -464, -463, -462, -461, -460, -459, -458, -457, -456, -455, -454, -453, -452, -451, -450, -449, -448, -447, -446, -445, -444, -443, -442, -441, -440, -439, -468, -467, -466, -465, -464, -463, -462, -461, -460, -459, -458, -457, -456, -455, -454]
+              },
+              "cellDLDetailState" : {
+                "u32DLMacThrput":"10M",
+                "u32DLPdcpThrput":"10M",
+                "u8DLRbRatio":"10%",
+                "u8DLAvrgShdUEForTTI":"14.1",
+                "u8DLAvrgHarqCnt":"1.0",
+                "u8DLAvrgBler":"10%",
+                "u16DLHarqFailRatio":"10%",
+                "u16DLHarqExpireRatio":"10%",
+                "u16DLAvrgMcs":"24",
+                "u16DtxRatio":"1000%%",
+                "u8TXDivTMRatio":"20%",
+                "u8TxCddRatio":"20%",
+                "u16DLMaxSchdMcs":"30",
+                "u16DLHqRetSuccRatio1":"10000%%",
+                "u16DLHqRetSuccRatio2":"10000%%",
+                "u16DLHqRetSuccRatio3":"10000%%",
+                "u16DLHqRetSuccRatio4":"10000%%"
+              },
+              "ueGeneralList":{
+                "u32UENum":"1500",
+                "ueDict":{
+                  "2041":{
+                    "ueGid":"2041",
+                    "u8PL":"106db",
+                    "u8TxDivRatio":"80%",
+                    "u32ULPdcpThrput":"20M",
+                    "u32DLPdcpThrput":"20M",
+                    "u32IP":"172.31.5.106",
+                    "u32ULMacThrput":"20M",
+                    "u32DLMacThrput":"20M",
+                    "u16ULSchdCnt":"80",
+                    "u16DLSchdCnt":"80",
+                    "u16ULHarqFailRatio":"50%",
+                    "u16DLHarqFailRatio":"50%",
+                    "u16ULHarqExpireRatio":"50%",
+                    "u16DLHarqExpireRatio":"50%",
+                    "u16ULAvrgMcs":"23",
+                    "u16DLAvrgMcs":"23",
+                    "u8ULAvrgHarqTxCnt":"100",
+                    "u8DLAvrgHarqTxCnt":"200",
+                    "u16ULAvrgRbNum":"80",
+                    "u16DLAvrgRbNum":"80",
+                    "u8ULAvrgBler":"50%",
+                    "u8DLAvrgBler":"50%",
+                    "u16DtxRatio":"70%%"
+                  },
+                  "2042":{
+                    "ueGid":"2042",
+                    "u8PL":"106db",
+                    "u8TxDivRatio":"80%",
+                    "u32ULPdcpThrput":"20M",
+                    "u32DLPdcpThrput":"20M",
+                    "u32IP":"172.31.5.106",
+                    "u32ULMacThrput":"20M",
+                    "u32DLMacThrput":"20M",
+                    "u16ULSchdCnt":"80",
+                    "u16DLSchdCnt":"80",
+                    "u16ULHarqFailRatio":"50%",
+                    "u16DLHarqFailRatio":"50%",
+                    "u16ULHarqExpireRatio":"50%",
+                    "u16DLHarqExpireRatio":"50%",
+                    "u16ULAvrgMcs":"23",
+                    "u16DLAvrgMcs":"23",
+                    "u8ULAvrgHarqTxCnt":"100",
+                    "u8DLAvrgHarqTxCnt":"200",
+                    "u16ULAvrgRbNum":"80",
+                    "u16DLAvrgRbNum":"80",
+                    "u8ULAvrgBler":"50%",
+                    "u8DLAvrgBler":"50%",
+                    "u16DtxRatio":"70%%"
+                  }
+                }
+              }
+            },
+            "253":{
+              "u8OpticPort":"8",
+              "cellGeneralCfg" : {
+                "u8CellID":"253",
+                "u32EnbId":"4250",
+                "u32CellCenterFreq":"1890.4M",
+                "u16CellPCI":"180",
+                "u8CellBandWidth":"5M",
+                "u8CellULDLConfig":"1",
+                "u8CellSpecSubFramCfg":"7",
+                "u8CellULAntNum":"4",
+                "u8CellDLAntNum":"1"
+              },
+              "cellGeneralState" : {
+                "u16SFN":"1032",
+                "u16ActiveUENum":"1500",
+                "s16NI":"-600dbm",
+                "u8TXPower":"80dbm"
+              },
+              "cellULDetailState" : {
+                "u32ULMacThrput":"10M",
+                "u32ULPdcpThrput":"10M",
+                "u8ULRbRatio":"10%",
+                "u8ULAvrgShdUEForTTI":"14.1",
+                "u8ULAvrgHarqCnt":"1.0",
+                "u8ULAvrgBler":"10%",
+                "u16ULHarqFailRatio":"10%",
+                "u16ULHarqExpireRatio":"10%",
+                "u16ULAvrgMcs":"20",
+                "u16ULMaxSchdMcs":"30",
+                "u16ULHqRetSuccRate1":"10000%%",
+                "u16ULHqRetSuccRate2":"10000%%",
+                "u16ULHqRetSuccRate3":"10000%%",
+                "u16ULHqRetSuccRate4":"10000%%",
+                "s16NiRB":[-468, -467, -466, -465, -464, -463, -462, -461, -460, -459, -458, -457, -456, -455, -454, -453, -452, -451, -450, -449, -448, -447, -446, -445, -444, -443, -442, -441, -440, -439, -468, -467, -466, -465, -464, -463, -462, -461, -460, -459, -458, -457, -456, -455, -454, -453, -452, -451, -450, -449, -448, -447, -446, -445, -444, -443, -442, -441, -440, -439, -468, -467, -466, -465, -464, -463, -462, -461, -460, -459, -458, -457, -456, -455, -454]
+              },
+              "cellDLDetailState" : {
+                "u32DLMacThrput":"10M",
+                "u32DLPdcpThrput":"10M",
+                "u8DLRbRatio":"10%",
+                "u8DLAvrgShdUEForTTI":"14.1",
+                "u8DLAvrgHarqCnt":"1.0",
+                "u8DLAvrgBler":"10%",
+                "u16DLHarqFailRatio":"10%",
+                "u16DLHarqExpireRatio":"10%",
+                "u16DLAvrgMcs":"24",
+                "u16DtxRatio":"1000%%",
+                "u8TXDivTMRatio":"20%",
+                "u8TxCddRatio":"20%",
+                "u16DLMaxSchdMcs":"30",
+                "u16DLHqRetSuccRatio1":"10000%%",
+                "u16DLHqRetSuccRatio2":"10000%%",
+                "u16DLHqRetSuccRatio3":"10000%%",
+                "u16DLHqRetSuccRatio4":"10000%%"
+              },
+              "ueGeneralList":{
+                "u32UENum":"1500",
+                "ueDict":{
+                  "2049":{
+                    "ueGid":"2049",
+                    "u8PL":"106db",
+                    "u8TxDivRatio":"80%",
+                    "u32ULPdcpThrput":"20M",
+                    "u32DLPdcpThrput":"20M",
+                    "u32IP":"172.31.5.106",
+                    "u32ULMacThrput":"20M",
+                    "u32DLMacThrput":"20M",
+                    "u16ULSchdCnt":"80",
+                    "u16DLSchdCnt":"80",
+                    "u16ULHarqFailRatio":"50%",
+                    "u16DLHarqFailRatio":"50%",
+                    "u16ULHarqExpireRatio":"50%",
+                    "u16DLHarqExpireRatio":"50%",
+                    "u16ULAvrgMcs":"23",
+                    "u16DLAvrgMcs":"23",
+                    "u8ULAvrgHarqTxCnt":"100",
+                    "u8DLAvrgHarqTxCnt":"200",
+                    "u16ULAvrgRbNum":"80",
+                    "u16DLAvrgRbNum":"80",
+                    "u8ULAvrgBler":"50%",
+                    "u8DLAvrgBler":"50%",
+                    "u16DtxRatio":"70%%"
+                  }
+                }
+              }
+            }
+          }
+        },
+        callbacklist = {
+          DrawUeInfo:null,
+          DrawCellInfo:null,
+          DrawNIInfo:DrawNICharts
+        },
+        TableData = null,
+        CellId = null;
+
+      if(Result.result !==0){
+        alert(Result.message);
+        return;
+      }
+      $("#StateTab a[href=#EISection]").on('shown.bs.tab', function (e) {
+        AdjustChartsHeight();
+      });
+
+
+      CurEIData = Result.ei_basic;
+      //TODO:缓存当前CellID，请求成功后检查携带的CellID与缓存值的不同，若不同，触发小区CellId更新事件
+      InitEICellInfo(CurEIData);
+      CellId = $("#CellSelector input:checked").val();
+      if(CellId !==null){
         UpdateEIData(CurEIData[CellId]);
+      }
+
+      setInterval(function(){
+        var Handler = null;
+        if(Result.result !==0){
+          alert(Result.message);
+          return;
+        }
+
+        CurEIData = Result.ei_basic;
+        CurEIData[CellId].cellGeneralState.u16SFN = (parseInt(CurEIData[CellId].cellGeneralState.u16SFN)+1)%1024;
+        //TODO:缓存当前CellID，请求成功后检查携带的CellID与缓存值的不同，若不同，触发小区CellId更新事件
+        InitEICellInfo(CurEIData);
+        CellId = $("#CellSelector input:checked").val();
+        if(CellId !==null){
+          UpdateEIData(CurEIData[CellId]);
+        }
+
+        for(var Item in callbacklist){
+          if(callbacklist.hasOwnProperty(Item)){
+            Handler = callbacklist[Item];
+            if(Handler !==null){
+              Handler(CurEIData[CellId]);
+            }
+          }
+        }
+
+      },TimerInterval);
+
+      $("#CellSelector input").change(function(e){
+        CellId = e.currentTarget.value;
+        if(CellId !==null) {
+          UpdateEIData(CurEIData[CellId]);
+          DestroyCharts(callbacklist);
+        }
+        else{
+          console.log("CellId is null");
+        }
 
 
+      });
+
+      $("#EiCellInfoSelector").change(function(e){
+        var UeInfoPara = e.target.value,
+            ParaText = $(this).find("option:selected").text();
+
+        $("#EiCellInfoChart").data("CellInfo", {CellId:CellId,Para:UeInfoPara,ParaText:ParaText});
+        DrawCellInfoCharts(CurEIData[CellId],true);
+
+        if(callbacklist.DrawCellInfo ===null){
+          callbacklist.DrawCellInfo = DrawCellInfoCharts;
+        }
+      });
+
+      $("#EiUeGidSelector").focus(function(e){
+        var UeGidList = [],
+            Gid = null;
+
+        TableData = $("#UEInfoTable").bootstrapTable('getData');
+        for(var Ueitem=0; Ueitem < TableData.length;Ueitem++){
+          Gid = TableData[Ueitem].GID;
+          if($(this).find("option[value="+Gid+"]").length !==0){
+            continue;
+          }
+          UeGidList.push($("<option/>").text(Gid).val(Gid)[0].outerHTML);
+        }
+        $(this).append(UeGidList.join(''));
+      });
+
+      $("#EiUeGidSelector").change(function(e){
+        var UeGid = e.target.value,
+            $UeInfoChart =  $('#EiUeInfoChart').highcharts(),
+            UeInfoSaved = $("#EiUeInfoChart").data("UEInfo");
+        if(UeInfoSaved !==undefined){
+          UeInfoSaved.Gid = UeGid;
+          if($UeInfoChart !=null){
+            $UeInfoChart.setTitle(null, { text: 'Gid:'+UeGid});
+          }
+
+        }
+        else{
+          UeInfoSaved  = {Gid:UeGid}
+        }
+        $("#EiUeInfoChart").data("UEInfo",UeInfoSaved);
+        $("#EiUeInfoSelector").show(500);
+
+      });
+
+      $("#EiUeInfoSelector").change(function(e){
+        var UeInfoPara = e.target.value,
+            UeInfoSaved = $("#EiUeInfoChart").data("UEInfo"),
+            ParaText = $(this).find("option:selected").text();
+
+        $("#EiUeInfoChart").data("UEInfo", $.extend({},UeInfoSaved,{Para:UeInfoPara,ParaText:ParaText}));
+        DrawUeInfoCharts(CurEIData[CellId],true);
+
+        if(callbacklist.DrawUeInfo ===null){
+          callbacklist.DrawUeInfo = DrawUeInfoCharts;
+        }
       });
     }
 
@@ -440,12 +796,12 @@ define(function(require){
 
       for(var CellId in EiData){
         if(EiData.hasOwnProperty(CellId)){
-          CellSelectorDOM[Index].value(CellId).parent().removeAttr("disabled");
+          CellSelectorDOM[Index].val(CellId).parent().removeAttr("disabled");
           Index++;
         }
       }
       for(DisableIndx = Index;DisableIndx < 3;DisableIndx++){
-        CellSelectorDOM[Index].attr("disabled","disabled");
+        CellSelectorDOM[DisableIndx].parent().attr("disabled","disabled");
       }
 
     }
@@ -472,7 +828,7 @@ define(function(require){
         }
         for(var CfgItem in Cfg){
           if(Cfg.hasOwnProperty(CfgItem) && GenericCfgDOM.hasOwnProperty(CfgItem)){
-            GenericCfgDOM[CfgItem].value(Cfg[CfgItem]);
+            GenericCfgDOM[CfgItem].val(Cfg[CfgItem]);
           }
         }
       }
@@ -486,7 +842,7 @@ define(function(require){
         }
         for(var StateItem in State){
           if(State.hasOwnProperty(StateItem) && GenericStateDOM.hasOwnProperty(StateItem)){
-            GenericStateDOM[StateItem].value(State[StateItem]);
+            GenericStateDOM[StateItem].val(State[StateItem]);
           }
         }
       }
@@ -500,7 +856,7 @@ define(function(require){
         }
         for(var StateItem in State){
           if(State.hasOwnProperty(StateItem) && DetailStateUl.hasOwnProperty(StateItem)){
-            DetailStateUl[StateItem].value(State[StateItem]);
+            DetailStateUl[StateItem].val(State[StateItem]);
           }
         }
       }
@@ -514,7 +870,7 @@ define(function(require){
         }
         for(var StateItem in State){
           if(State.hasOwnProperty(StateItem) && DetailStateDl.hasOwnProperty(StateItem)){
-            DetailStateDl[StateItem].value(State[StateItem]);
+            DetailStateDl[StateItem].val(State[StateItem]);
           }
         }
       }
@@ -522,14 +878,15 @@ define(function(require){
       function UpdateUeInfo(UeList){
         var UeItem = null,
             UeInfo = EIInfoDOM.UEInfo,
-            UeListTable =$("#UEInfoTable"),
-            rowItem = null,
+            UeListTable = $("#UEInfoTable"),
+            rowItem = [],
             TableDataField = [];
 
         if(UeList==null||UeList.length ===0){
           console.log("UeList does not exists");
           return;
         }
+
         for(var item in UeList){
           if(UeList.hasOwnProperty(item)){
             UeItem = UeList[item];
@@ -539,10 +896,395 @@ define(function(require){
               }
             }
             TableDataField.push(rowItem);
+            rowItem = [];
           }
         }
-        UeListTable.bootstrapTable({data: TableDataField});
+        UeListTable.bootstrapTable('load',TableDataField);
 
+      }
+    }
+
+    function DrawCellInfoCharts(CellInfoList,ParaChangeFlag){
+
+      var chart = $('#EiCellInfoChart').highcharts(),
+        chartSeries = null,
+        CellInfo = $('#EiCellInfoChart').data("CellInfo"),
+        paraVal = null;
+
+      if(CellInfo ==null){
+        console.log("No CellInfo:");
+        return;
+      }
+      if(CellInfo.ParaText.slice(0,2) ==="UL"){
+        paraVal = parseInt(CellInfoList.cellULDetailState[CellInfo.Para]);
+      }
+      else{
+        paraVal = parseInt(CellInfoList.cellDLDetailState[CellInfo.Para]);
+      }
+      if(paraVal==null){
+        console.log("UeParaList has no "+CellInfo.Para+" para");
+        return;
+      }
+
+      if(chart ==null){
+        $('#EiCellInfoChart').highcharts({
+          chart: {
+            type: 'spline',
+            animation: Highcharts.svg, // don't animate in old IE
+            marginRight: 10,
+            events: {
+            }
+          },
+          credits: {
+            enabled: false
+          },
+          title: {
+            text: CellInfo.ParaText
+          },
+          subtitle: {
+            text: 'CellID: '+CellInfo.CellId
+          },
+          legend:{
+            enabled:false
+          },
+          xAxis: {
+            title: {
+              text: 'Time(s)'
+            },
+            tickInterval: 5,
+            minRange:30,
+            minPadding:0.01,
+            showEmpty: false
+          },
+          yAxis: {
+            title: {
+              text: ''
+            },
+            plotOptions:{
+              series:{
+                animation:false
+              }
+            },
+            showEmpty: false,
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+
+          tooltip: {
+            crosshairs: true,
+            formatter: function() {
+              return '<b>'+ this.series.name +'</b><br>'+
+                this.x+"s" +'<br>'+
+                Highcharts.numberFormat(this.y, 2);
+            }
+          },
+          exporting: {
+            enabled: false
+          },
+          series: [
+            {
+              name: CellInfo.Para,
+              data:[paraVal],
+              color:'#8085e9'
+            }]
+        });
+      }
+      else{
+        chartSeries = chart.series[0];
+        if(ParaChangeFlag ===true){
+          chart.setTitle( {text: CellInfo.ParaText});
+          chart.series[0].setData([paraVal]);
+          chartSeries.update({
+            name: CellInfo.Para,
+            color:'#8085e9'
+          });
+          return;
+        }
+        if(chartSeries.processedXData.length >=30){
+          chartSeries.addPoint(paraVal,true,true);
+        }
+        else{
+          chartSeries.addPoint(paraVal,true,false);
+        }
+
+      }
+
+    }
+
+    function DrawUeInfoCharts(CellInfoList,ParaChangeFlag){
+      var chart = $('#EiUeInfoChart').highcharts(),
+          chartSeries = null,
+          UeList = CellInfoList.ueGeneralList.ueDict,
+          UeInfo = $('#EiUeInfoChart').data("UEInfo"),
+          UeItem = UeList[UeInfo.Gid],
+          paraVal = parseInt(UeItem[UeInfo.Para]);
+
+      if(UeInfo ==null){
+        console.log("No UEInfo:");
+        return;
+      }
+      if(paraVal==null){
+        console.log("UeParaList has no "+UeInfo.Para+" para");
+        return;
+      }
+
+      if(chart ==null){
+        $('#EiUeInfoChart').highcharts({
+          chart: {
+            type: 'spline',
+            animation: Highcharts.svg, // don't animate in old IE
+            marginRight: 10,
+            events: {
+            }
+          },
+          credits: {
+            enabled: false
+          },
+          title: {
+            text: UeInfo.ParaText
+          },
+          subtitle: {
+            text: 'Gid:'+UeInfo.Gid
+          },
+          legend:{
+            enabled:false
+          },
+          xAxis: {
+            title: {
+              text: 'Time(s)'
+            },
+            tickInterval: 5,
+            minRange:30,
+            minPadding:0.01,
+            showEmpty: false
+          },
+          yAxis: {
+            title: {
+              text: ''
+            },
+            plotOptions:{
+              series:{
+                animation:false
+              }
+            },
+            showEmpty: false,
+            plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#808080'
+            }]
+          },
+
+          tooltip: {
+            crosshairs: true,
+            formatter: function() {
+              return '<b>'+ this.series.name +'</b><br>'+
+                this.x+"s" +'<br>'+
+                Highcharts.numberFormat(this.y, 2);
+            }
+          },
+          exporting: {
+            enabled: false
+          },
+          series: [
+            {
+              name: UeInfo.Para,
+              data:[paraVal],
+              color:'#8085e9'
+            }]
+        });
+      }
+      else{
+        chartSeries = chart.series[0];
+        if(ParaChangeFlag ===true){
+          chart.setTitle( {text: UeInfo.ParaText});
+          chart.series[0].setData([paraVal]);
+          chartSeries.update({
+            name: UeInfo.Para,
+            color:'#8085e9'
+          });
+          return;
+        }
+        if(chartSeries.processedXData.length >=30){
+          chartSeries.addPoint(paraVal,true,true);
+        }
+        else{
+          chartSeries.addPoint(paraVal,true,false);
+        }
+
+      }
+    }
+
+    function DrawNICharts(CellInfoList){
+      var chart = $('#EiNIChart').highcharts(),
+          NIValList = CellInfoList.cellULDetailState.s16NiRB,
+          chartSeries = null;
+
+
+      if(NIValList ==null ||NIValList.length===0){
+        console.log("No UEInfo:");
+        return;
+      }
+
+      if(chart ==null){
+        $('#EiNIChart').highcharts({
+          type: 'spline',
+          animation: Highcharts.svg, // don't animate in old IE
+          marginRight: 10,
+          events: {
+          },
+          title: {
+            text: 'NI'
+          },
+          credits: {
+            enabled: false
+          },
+          xAxis: {
+            title: {
+              text: 'RB'
+            },
+            tickInterval: 10,
+            minPadding:0.01,
+            showEmpty: false
+          },
+          yAxis: {
+            title: {
+              text: ''
+            }
+          },
+          tooltip: {
+            shared: true
+          },
+          legend: {
+            enabled: false
+          },
+          plotOptions: {
+            series: {
+              pointStart: 1
+            },
+            area: {
+              fillColor: {
+                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              lineWidth: 1,
+              marker: {
+                enabled: false
+              },
+              shadow: false,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+          series: [{
+            type: 'area',
+            name: 'NI',
+            data:NIValList
+          }]
+        });
+      }
+      else{
+        chartSeries = chart.series[0];
+        chart.series[0].setData(NIValList);
+
+      }
+    }
+
+    function DestroyCharts(callbacklist){
+      var $CellChart = $("#EiCellInfoChart").highcharts(),
+          $UeInfoChart = $("#EiUeInfoChart").highcharts();
+
+      if($CellChart !=null){
+        callbacklist.DrawCellInfo = null;
+        $CellChart.destroy();
+      }
+      if($UeInfoChart !=null){
+        callbacklist.DrawUeInfo = null;
+        $UeInfoChart.destroy();
+      }
+      $("#EiCellInfoSelector").find("option:first-child").attr("selected",true);
+      $("#EiUeGidSelector").find("option:first-child").attr("selected",true);
+      //BugFixed:小区切换时未删除原小区UE列表
+      $("#EiUeGidSelector option:gt(0)").remove();
+      $("#EiUeInfoSelector").hide().find("option:first-child").attr("selected",true);
+    }
+
+    function CreateTaskHandle(TaskStatus){
+      var CurTaskId = TaskStatus.task_id;
+      var NextLogId = 0;
+      var CurTimerID = null;
+      var TaskUITimer = null;
+      if(CurTaskId ==null || CurTaskId.length ===0){
+        return null;
+      }
+      TestEI(CurTaskId);
+      $('#TestCaseGrpSection').hide(1000);
+      $("#VerSelectSection").hide(1000);
+      $("#BeginTest").button('loading');
+      TaskUITimer = ParseTaskRunningSection(CurTaskId);
+
+      return function TaskLogHandler(TaskLog,Res){
+
+        if(TaskLog.log.length !== 0){
+          NextLogId = ParseTaskLogSection(TaskLog.log,NextLogId,TaskLog.current_log_id);
+          $("#Log_TaskStatus").data("plugin_tinyscrollbar").update("relative");
+        }
+
+        if(TaskLog.status === "run"){
+          if(CurTimerID ===null){
+            CurTimerID = setInterval(function () {
+              Res.QueryRunningLog(TaskLogHandler,CurTaskId,NextLogId);
+            }, 3000);
+          }
+          else if(NextLogId >TaskLog.current_log_id){
+            clearInterval(CurTimerID);
+            CurTimerID = setInterval(function () {
+              Res.QueryRunningLog(TaskLogHandler,CurTaskId,NextLogId);
+            }, 3000);
+          }
+        }
+        else if(TaskLog.status === "close"){
+          //停止轮询Log定时器
+          if(CurTimerID !== null)
+          {
+            clearInterval(CurTimerID);
+            CurTimerID = null;
+          }
+          if(TaskUITimer !== null)
+          {
+            clearInterval(TaskUITimer);
+            TaskUITimer = null;
+          }
+          Res.TaskStatusQuery(TaskLog.task_id,TaskEndHandle);
+
+
+        }
+
+
+
+      }
+    }
+
+    function AdjustChartsHeight(){
+      var TotalHeight = $("#EISection .CellBasicInfo").height(),
+          ChartList = [$("#EiCellInfoChart"),$("#EiUeInfoChart"),$("#EiNIChart")],
+          SelectionHeight = 0;
+
+      for(var item in ChartList){
+        if(ChartList.hasOwnProperty(item)){
+          SelectionHeight =  ChartList[item].prev(".Selection").height();
+          ChartList[item].height(TotalHeight/3 - SelectionHeight);
+        }
       }
     }
 
@@ -675,62 +1417,6 @@ define(function(require){
     }
     else{
       //错误处理
-    }
-  }
-
-  function CreateTaskHandle(TaskStatus){
-    var CurTaskId = TaskStatus.task_id;
-    var NextLogId = 0;
-    var CurTimerID = null;
-    var TaskUITimer = null;
-    if(CurTaskId ==null || CurTaskId.length ===0){
-      return null;
-    }
-
-    $('#TestCaseGrpSection').hide(1000);
-    $("#VerSelectSection").hide(1000);
-    $("#BeginTest").button('loading');
-    TaskUITimer = ParseTaskRunningSection(CurTaskId);
-
-    return function TaskLogHandler(TaskLog,Res){
-
-      if(TaskLog.log.length !== 0){
-        NextLogId = ParseTaskLogSection(TaskLog.log,NextLogId,TaskLog.current_log_id);
-        $("#Log_TaskStatus").data("plugin_tinyscrollbar").update("relative");
-      }
-
-      if(TaskLog.status === "run"){
-        if(CurTimerID ===null){
-          CurTimerID = setInterval(function () {
-            Res.QueryRunningLog(TaskLogHandler,CurTaskId,NextLogId);
-          }, 3000);
-        }
-        else if(NextLogId >TaskLog.current_log_id){
-          clearInterval(CurTimerID);
-          CurTimerID = setInterval(function () {
-            Res.QueryRunningLog(TaskLogHandler,CurTaskId,NextLogId);
-          }, 3000);
-        }
-      }
-      else if(TaskLog.status === "close"){
-        //停止轮询Log定时器
-        if(CurTimerID !== null)
-        {
-          clearInterval(CurTimerID);
-          CurTimerID = null;
-        }
-        if(TaskUITimer !== null)
-        {
-          clearInterval(TaskUITimer);
-          TaskUITimer = null;
-        }
-        Res.TaskStatusQuery(TaskLog.task_id,TaskEndHandle);
-
-
-      }
-
-
-
     }
   }
 

@@ -179,7 +179,40 @@ input{
 .home-page table a.btn{
   margin-right: 7px;
 }
-
+.home-page .TaskContent{
+  width: 1380px;
+}
+.home-page .TaskContent .CellBasicInfo .col-md-3{
+  width: 20%;
+}
+.home-page .TaskContent .CellBasicInfo .col-md-4{
+  width: 25%;
+}
+.home-page  #EISection .CellBasicInfo{
+  width: 63.5%;
+  padding: 0;
+}
+.home-page  #EISection .CellChart{
+  width: 36.5%;
+}
+.home-page  #EISection .EiChartSection{
+  padding: 0 0 38px 0;
+}
+.home-page  #EISection .EiChartSection:last-child{
+  padding-bottom: 0;
+}
+.home-page  #EISection .Selection{
+  padding: 0;
+}
+.home-page  #EISection .Selection .SelectItem:first-child{
+  padding: 0 60px 0 0;
+}
+.home-page  #EISection .Selection .SelectItem{
+  padding: 0 0 0 40px;
+}
+.home-page  #EISection .EI_GeneralConfig,.EI_GeneralState,.EI_DetailStateUl,.EI_DetailStateDl,.EI_UEInfo{
+  margin-top: 30px;
+}
 .home-page  #EISection .EI_GeneralConfig .input-group-addon{
   min-width: 83px;
   height: 28px;
@@ -230,7 +263,6 @@ input{
   padding: 5px;
 }
 
-
 .home-page  #EISection .EI_DetailStateUl .col-md-4{
   margin-top: 0;
   padding-left: 0;
@@ -252,7 +284,7 @@ input{
 }
 
 .home-page  #EISection .EI_DetailStateUl .MaxLenInput{
-  padding: 5px;
+  padding: 0 2px 0 2px;
 }
 
 .home-page  #EISection .EI_DetailStateDl .col-md-4{
@@ -276,11 +308,15 @@ input{
 }
 
 .home-page  #EISection .EI_DetailStateDl .MaxLenInput{
-  padding: 5px;
+  padding: 0 2px 0 2px;
+}
+
+.home-page  #EISection .EI_UEInfo{
+
 }
 
 .home-page  #EISection #CellSelector{
-  margin-bottom: 30px;
+
 }
 .home-page  #EISection #UEInfoTable th{
   font-weight: 100;
